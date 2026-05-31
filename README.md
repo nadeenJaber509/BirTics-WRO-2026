@@ -16,14 +16,35 @@ Our vision is to develop a reliable autonomous vehicle that can complete the WRO
 
 ## Development Roadmap## 🚗 BirTics Development Path
 
-| Stage | Status |
-|---------|---------|
-| 🎯 Vision | ✅ |
-| 📋 Requirements Analysis | ✅ |
-| 📅 Planning | 🔄 |
-| 🔍 Research | ⏳ |
-| ✏️ Concept Development | ⏳ |
-| ⚙️ Engineering Design | ⏳ |
-| 🔩 Construction & Integration | ⏳ |
-| 🧪 Testing & Optimization | ⏳ |
-| 🏁 Competition Ready | 🎯 |
+---
+
+أو النسخة الأحلى لــ WRO:
+
+````markdown
+## 🚗 BirTics Development Journey
+
+```mermaid
+flowchart TD
+
+A["🎯 Vision"] --> B["📋 Requirements Analysis"]
+
+B --> C["📅 Planning"]
+
+C --> D["💡 Brainstorming"]
+
+D --> E["✏️ Hand Sketches"]
+
+E --> F["🤖 AI Concepts"]
+
+F --> G["📐 Engineering Design"]
+
+G --> H["🖨️ 3D Printing"]
+
+H --> I["🔩 Robot Construction"]
+
+I --> J["💻 Software Integration"]
+
+J --> K["🧪 Testing & Optimization"]
+
+K --> L["🏁 Competition Ready"]
+```
