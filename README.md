@@ -14,39 +14,16 @@ Our vision is to develop a reliable autonomous vehicle that can complete the WRO
 
 ---
 
-## Development Roadmap
-## Development Journey
+## Development Roadmap## 🚗 BirTics Development Path
 
-🔵 Vision
-
-⬇️
-
-🔵 Requirements Analysis
-
-⬇️
-
-🔵 Planning
-
-⬇️
-
-⚪ Research
-
-⬇️
-
-⚪ Concept Development
-
-⬇️
-
-⚪ Engineering Design
-
-⬇️
-
-⚪ Construction & Integration
-
-⬇️
-
-⚪ Testing & Optimization
-
-⬇️
-
-🏁 Competition Ready
+| Stage | Status |
+|---------|---------|
+| 🎯 Vision | ✅ |
+| 📋 Requirements Analysis | ✅ |
+| 📅 Planning | 🔄 |
+| 🔍 Research | ⏳ |
+| ✏️ Concept Development | ⏳ |
+| ⚙️ Engineering Design | ⏳ |
+| 🔩 Construction & Integration | ⏳ |
+| 🧪 Testing & Optimization | ⏳ |
+| 🏁 Competition Ready | 🎯 |
