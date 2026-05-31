@@ -15,51 +15,38 @@ Our vision is to develop a reliable autonomous vehicle that can complete the WRO
 ---
 
 ## Development Roadmap
+## Development Journey
 
-┌───────────────┐
-│ 🎯 Vision     │
-└───────┬───────┘
-        │
-        ▼
-┌──────────────────────┐
-│ 📋 Requirements      │
-│ Analysis             │
-└──────────┬───────────┘
-           │
-           ▼
-┌───────────────┐
-│ 📅 Planning   │
-└───────┬───────┘
-        │
-        ▼
-┌───────────────┐
-│ 🔍 Research   │
-└───────┬───────┘
-        │
-        ▼
-┌────────────────────┐
-│ ✏️ Concept Design  │
-└─────────┬──────────┘
-          │
-          ▼
-┌───────────────┐
-│ ⚙️ Engineering │
-└───────┬───────┘
-        │
-        ▼
-┌────────────────────┐
-│ 🔩 Construction    │
-│ & Integration      │
-└─────────┬──────────┘
-          │
-          ▼
-┌────────────────────┐
-│ 🧪 Testing &       │
-│ Optimization       │
-└─────────┬──────────┘
-          │
-          ▼
-┌────────────────────┐
-│ 🏁 Competition     │
-│ Ready              │
-└────────────────────┘
+🔵 Vision
+
+⬇️
+
+🔵 Requirements Analysis
+
+⬇️
+
+🔵 Planning
+
+⬇️
+
+⚪ Research
+
+⬇️
+
+⚪ Concept Development
+
+⬇️
+
+⚪ Engineering Design
+
+⬇️
+
+⚪ Construction & Integration
+
+⬇️
+
+⚪ Testing & Optimization
+
+⬇️
+
+🏁 Competition Ready
