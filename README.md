@@ -14,24 +14,6 @@ Our vision is to develop a reliable autonomous vehicle that can complete the WRO
 
 ---
 
-## Development Roadmap## 🚗 BirTics Development Path
-
----
-## Development Journey
-
-<p align="center">
-  <img src="images/development-roadmap.png" width="900">
-</p>
-
-### Current Phase
-
-The team is currently focused on:
-
-* Understanding WRO requirements
-* Organizing project documentation
-* Defining team responsibilities
-* Planning the development process
-
 ### Development Stages
 
 | Stage                         | Objective                                    |
