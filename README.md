@@ -17,34 +17,36 @@ Our vision is to develop a reliable autonomous vehicle that can complete the WRO
 ## Development Roadmap## 🚗 BirTics Development Path
 
 ---
+## Development Journey
 
-أو النسخة الأحلى لــ WRO:
+<p align="center">
+  <img src="images/development-roadmap.png" width="900">
+</p>
 
-````markdown
-## 🚗 BirTics Development Journey
+### Current Phase
 
-```mermaid
-flowchart TD
+The team is currently focused on:
 
-A["🎯 Vision"] --> B["📋 Requirements Analysis"]
+* Understanding WRO requirements
+* Organizing project documentation
+* Defining team responsibilities
+* Planning the development process
 
-B --> C["📅 Planning"]
+### Development Stages
 
-C --> D["💡 Brainstorming"]
+| Stage                         | Objective                                    |
+| ----------------------------- | -------------------------------------------- |
+| 🎯 Vision                     | Define goals and project direction           |
+| 📋 Requirements Analysis      | Study WRO rules and challenge requirements   |
+| 📅 Planning                   | Organize tasks, milestones, and workflow     |
+| 💡 Brainstorming              | Generate and evaluate possible solutions     |
+| ✏️ Concept Development        | Create sketches and initial concepts         |
+| 🤖 AI Visualization           | Visualize ideas before implementation        |
+| 📐 Engineering Design         | Design mechanical and electronic systems     |
+| 🖨️ 3D Printing               | Manufacture custom components                |
+| 🔩 Construction & Integration | Build and integrate robot systems            |
+| 🧪 Testing & Optimization     | Improve performance through testing          |
+| 🏁 Competition Ready          | Final validation and competition preparation |
 
-D --> E["✏️ Hand Sketches"]
-
-E --> F["🤖 AI Concepts"]
-
-F --> G["📐 Engineering Design"]
-
-G --> H["🖨️ 3D Printing"]
-
-H --> I["🔩 Robot Construction"]
-
-I --> J["💻 Software Integration"]
-
-J --> K["🧪 Testing & Optimization"]
-
-K --> L["🏁 Competition Ready"]
+```
 ```
