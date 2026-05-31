@@ -4,8 +4,7 @@
 
 **BirTics** is a robotics team participating in the **WRO 2026 Future Engineers** category.
 
-We aim to build an autonomous self-driving robot through a clear engineering process based on planning, research, design, construction, testing, and continuous improvement.
-
+We follow a structured engineering approach that emphasizes planning, research, design, testing, and continuous improvement throughout the development process.
 ---
 
 ## Project Vision
@@ -30,5 +29,3 @@ Our vision is to develop a reliable autonomous vehicle that can complete the WRO
 | 🧪 Testing & Optimization     | Improve performance through testing          |
 | 🏁 Competition Ready          | Final validation and competition preparation |
 
-```
-```
