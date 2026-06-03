@@ -267,7 +267,7 @@ We are a team of engineering students from **Birzeit University, Palestine**, ea
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   B I R T I C S  ·  W R O  F U T U R E  E N G I N E E R S
        "From Sketches to Autonomy"
-       Birzeit University · Palestine · 2025
+       Birzeit University · Palestine · 2026
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
