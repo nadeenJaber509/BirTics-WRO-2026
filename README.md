@@ -356,11 +356,11 @@ We are a team of engineering students from **Birzeit University, Palestine**, co
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   B I R T I C S  ·  W R O  F U T U R E  E N G I N E E R S
          "From Sketches to Autonomy"
-         Birzeit University · Palestine · 2025
+         Birzeit University · Palestine · 2026
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 *This repository is a living document. It is updated continuously throughout the engineering process.*
-*Last structure update: June 2025 — Phase 1: Research & Concept Development*
+*Last structure update: June 2026 — Phase 1: Research & Concept Development*
 
 </div>
