@@ -1,11 +1,11 @@
-<!-- ═══════════════════════════════════════════════════════════════════════════
+<!-- ════════════════════════════════════════════════════════════════
      BirTics · WRO Future Engineers · README
-     ═══════════════════════════════════════════════════════════════════════════ -->
+     ════════════════════════════════════════════════════════════════
 
 <div align="center">
 
 <!-- HERO BANNER PLACEHOLDER -->
-<img src="docs/story-portfolio/assets/team-banner.png" alt="BirTics Team Banner" width="100%">
+<img src="assets/team-banner.png" alt="BirTics Team Banner" width="100%">
 <!-- Replace with your actual team banner image when ready -->
 
 <br/>
@@ -180,7 +180,7 @@
 
 This repository is **the complete engineering record** of Team BirTics.
 
-We believe that the quality of a team's thinking is best demonstrated not just by the robot on competition day — but by the trail of decisions, experiments, failures, and improvements that led there.
+We believe that the quality of a team's thinking is best demonstrated not just by the robot on competition day — but by the trail of decisions, experiments, failures, and improvements that led [...]
 
 Every file in this repository answers one of four questions:
 
@@ -210,6 +210,12 @@ This is **evidence-based engineering** — not just showing what we built, but p
 
 ```
   BirTics/
+  │
+  ├── 📁 assets/                          ← All visual evidence (photos, sketches, videos)
+  │     Team photos · Hand sketches · AI concepts · Models · Testing photos
+  │
+  ├── 📁 code/                            ← Robot firmware and software
+  │     All control algorithms, sensor drivers, motor logic.
   │
   ├── 📁 docs/
   │   │
@@ -263,7 +269,7 @@ This is **evidence-based engineering** — not just showing what we built, but p
 |---|---|
 | 📷 | **Team Photo** |
 | | *`[ Team photo coming soon — first team session ]`* |
-| | `docs/story-portfolio/assets/team-photo.jpg` |
+| | `assets/team-photo.jpg` |
 
 ---
 
@@ -335,7 +341,7 @@ This is **evidence-based engineering** — not just showing what we built, but p
 
 > Full team profiles, roles, and responsibilities are documented in [→ Team Roles](docs/team-roles.md).
 
-We are a team of engineering students from **Birzeit University, Palestine**, competing in WRO Future Engineers 2025. We chose this challenge not just to compete — but to build something we can genuinely be proud of engineering from scratch.
+We are a team of engineering students from **Birzeit University, Palestine**, competing in WRO Future Engineers 2025. We chose this challenge not just to compete — but to build something we can[...]
 
 ---
 
