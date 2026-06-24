@@ -46,7 +46,7 @@ def main():
         elif robot_state == RobotState.LANE_FOLLOW:
             sensor_data = read_all_sensors()
 
-            error = sensor_data["tof_left"] - sensor_data["tof_right"]
+            error = sensor_data["lidar_left"] - sensor_data["lidar_right"]
             correction = pid.calculate(error)
 
             set_steering_angle(correction)
