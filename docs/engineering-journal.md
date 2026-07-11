@@ -139,11 +139,23 @@ Instead of using a steering mechanism, movement depended entirely on controlling
 Although simple, this approach enabled the team to verify the basic principles of autonomous movement without introducing unnecessary mechanical complexity during the early stages of development.
 
 ---
+<p align="center">
+  <img src="../assets/prototype-v1-top.jpeg" width="650">
+</p>
 
-📷 **Figure 1.** Top view of the first prototype assembled on **19 May 2026**.
+<p align="center">
+<b>Figure 1.</b> Top view of the first prototype assembled on <b>19 May 2026</b>.
+</p>
 
-📷 **Figure 2.** Bottom view showing the differential-drive configuration using two independently controlled DC motors.
+---
 
+<p align="center">
+  <img src="../assets/prototype-v1-bottom.jpeg" width="650">
+</p>
+
+<p align="center">
+<b>Figure 2.</b> Bottom view showing the differential-drive configuration using two independently controlled DC motors.
+</p>
 ---
 
 > [!NOTE]
@@ -249,8 +261,13 @@ The new chassis offered:
 
 Most importantly, it provided a stronger foundation for building the competition robot rather than continuing to develop a temporary prototype.
 
-📷 **Figure 3.** RC steering chassis adopted after the prototype evaluation.
+<p align="center">
+  <img src="../assets/rc-chassis-selection.jpeg" width="650">
+</p>
 
+<p align="center">
+<b>Figure 3.</b> Ready-made RC steering chassis adopted as the new mechanical platform following the evaluation of the initial differential-drive prototype.
+</p>
 ---
 
 ## Comparing Both Platforms
