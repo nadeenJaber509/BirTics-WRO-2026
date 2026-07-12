@@ -14,4 +14,3 @@ This directory contains the engineering documentation for the BirTics WRO 2026 p
 | 👥 Team Roles | Team responsibilities and project organization. |
 | 📚 Story Portfolio | Background and motivation of the project. |
 
-Use the repository's main **README** as the starting point for navigating the complete project documentation.
