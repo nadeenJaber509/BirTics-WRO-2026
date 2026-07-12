@@ -365,6 +365,13 @@ Since the robot must operate autonomously, accurate and consistent distance meas
 Rather than selecting the first available sensor, we compared different technologies and evaluated how well they matched the project's requirements.
 
 ---
+### First ToF Integration
+
+Following the sensor selection process, the team began integrating the selected Time-of-Flight sensors into the robot.
+
+This marked the transition from architectural planning to practical implementation. The initial work focused on wiring, communication testing, and verifying that the sensors could be reliably read by the ESP32 before they became part of the navigation system.
+
+At this stage, the objective is to validate the sensing hardware rather than evaluate the robot's navigation performance.
 
 ## Initial Consideration
 
@@ -550,47 +557,49 @@ Each future improvement is expected to build upon the engineering decisions alre
 > **Current Focus**
 >
 > The current stage emphasizes integration, testing, and refinement rather than selecting new hardware concepts. Most future work will focus on improving reliability and validating the existing design.
+
+---
 # 🏁 Preparing for the Trial Competition
 
-The team is currently preparing for the upcoming **WRO Trial Competition**, which represents the first opportunity to evaluate the current robot under conditions similar to the official competition.
+As the project moved from planning toward implementation, the team's focus shifted to preparing the robot for the upcoming **WRO Trial Competition**, scheduled for **13 July 2026**.
 
-Rather than viewing the event as a final performance, we consider it an important engineering milestone.
+Unlike the initial prototype, this stage emphasizes integrating the selected hardware and validating the engineering decisions made throughout the project.
 
-Its primary purpose is to validate the decisions made throughout the project and identify opportunities for further improvement before the national competition.
+The trial competition represents the first opportunity to evaluate the new robot configuration under conditions closer to the official competition.
 
-## Main Objectives
+---
 
-- Verify the integration of the selected hardware components.
-- Evaluate the robot's overall performance.
-- Observe how the current design behaves in realistic conditions.
-- Identify weaknesses that require further refinement.
-- Collect observations to guide future improvements.
+## Current Development Focus
 
-> [!IMPORTANT]
-> **Engineering Perspective**
->
-> The trial competition is considered part of the development process rather than the end of it. The feedback gathered during this stage will help shape the next iteration of the robot.
+At the time of writing, the team is actively working on:
+
+- Wiring and integrating the robot's electronic components.
+- Testing the Time-of-Flight (ToF) sensors after selecting them as the primary distance sensing solution.
+- Verifying communication between the ESP32 and connected sensors.
+- Preparing the robot for its first tests using the new hardware architecture.
+
+Unlike the first prototype, which relied on ultrasonic sensors, the current robot introduces ToF sensors as part of the updated sensing strategy. This requires both hardware integration and software validation before full autonomous testing can begin.
+
+---
+
+## Engineering Goal
+
+The objective of the trial competition is not only to evaluate performance, but also to verify that the selected architecture behaves as expected under realistic operating conditions.
+
+The observations collected during this stage will guide future refinements in both hardware and software before the national competition.
 
 > [!NOTE]
-> **Future Update**
->
-> This section will be expanded after the trial competition with observations, lessons learned, and any engineering decisions that result from the testing experience.
+> This section reflects the project's current development stage. The trial competition has not yet taken place, and this journal will be updated afterward with the test results, observations, and any engineering decisions that follow.
+
+# 🧪 Trial Competition Evaluation
 
 # 🔍 Engineering Reflections
 
-Looking back, the development of the BirTics robot has been shaped by continuous evaluation rather than by following a fixed plan.
+Throughout this project, we learned that engineering is an iterative process rather than a straight path to a final solution.
 
-Every important decision—from building the first prototype to selecting the controller, evaluating sensors, redesigning the mechanical platform, and improving documentation—was made through discussion, comparison, and careful consideration of the project's requirements.
+Every prototype, design revision, and technical discussion helped us reduce uncertainty and make more informed decisions. Instead of aiming for a perfect design from the beginning, we focused on continuous improvement supported by testing, documentation, and teamwork.
 
-Throughout this journey, several principles became clear:
-
-- Engineering decisions should be based on evidence rather than assumptions.
-- A prototype is valuable because it answers engineering questions, not because it becomes the final product.
-- Selecting the most powerful hardware is not always the best solution; selecting the most appropriate hardware is often more effective.
-- Higher implementation complexity can be justified when it significantly improves system performance.
-- Documentation preserves engineering knowledge and supports better decision-making throughout the project.
-
-More than anything, this project has shown us that engineering is an iterative process. Every prototype, discussion, and redesign has contributed to the robot we continue to build today.
+Looking back, the most valuable outcome has not only been the robot itself, but also the engineering experience gained while developing it.
 
 # 🚀 Looking Ahead
 
@@ -609,7 +618,6 @@ Following the trial competition, the Engineering Journey will continue to grow b
 
 Rather than documenting only the final robot, this journal will continue to record the reasoning behind its evolution.
 
----
 
 <div align="center">
 
