@@ -57,8 +57,6 @@ The following guide is designed to help judges and reviewers quickly navigate th
 | Document | Description |
 |----------|-------------|
 | [Team Story](docs/story-portfolio/team-story.md) | The team's background and project motivation |
-| [Architecture Decisions](docs/system-decisions/robot-architecture-v1.md) | Initial robot architecture and major design decisions |
-| [Hardware Distribution](docs/mechanical-design/hardware-distribution.md) | Hardware selection, placement, and engineering rationale |
 | [ESP32 Software Strategy](docs/software-architecture/esp32_software_strategy.md) | Overall software implementation approach |
 | [Algorithms Plan](docs/software-architecture/algorithms_plan.md) | Navigation, control, and decision-making algorithms |
 | [ESP32 Firmware](code/esp32/) | Current Arduino/ESP32 firmware implementation |
