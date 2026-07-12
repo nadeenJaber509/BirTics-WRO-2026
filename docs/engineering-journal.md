@@ -567,6 +567,16 @@ Unlike the initial prototype, this stage emphasizes integrating the selected har
 
 The trial competition represents the first opportunity to evaluate the new robot configuration under conditions closer to the official competition.
 
+At the time of writing, the team is actively integrating the newly selected Time-of-Flight (ToF) sensors with the ESP32 controller. The current work focuses on wiring, communication testing, and validating the sensors before they become part of the robot's navigation system.
+
+<p align="center">
+<img src="../assets/tof-integration-testing.jpg" width="700">
+</p>
+
+<p align="center">
+<b>Figure X.</b> Initial integration and validation of the VL6180X Time-of-Flight sensor with the ESP32 during preparation for the WRO Trial Competition.
+</p>
+
 ---
 
 ## Current Development Focus
@@ -591,7 +601,11 @@ The observations collected during this stage will guide future refinements in bo
 > [!NOTE]
 > This section reflects the project's current development stage. The trial competition has not yet taken place, and this journal will be updated afterward with the test results, observations, and any engineering decisions that follow.
 
+---
+
 # 🧪 Trial Competition Evaluation
+
+---
 
 # 🔍 Engineering Reflections
 
