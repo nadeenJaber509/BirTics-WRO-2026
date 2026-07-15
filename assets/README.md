@@ -8,7 +8,7 @@ This folder contains photographs documenting the current BirTics WRO 2026 robot 
 
 ### Perspective View
 
-![Prototype](prototype-perspective-1.JPG)
+![Prototype](robot/prototype-perspective-1.JPG)
 
 ---
 
