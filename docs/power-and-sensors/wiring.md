@@ -25,7 +25,7 @@ Power is supplied by a rechargeable 9 V battery.
 # Prototype Wiring
 
 <p align="center">
-<img src="../../assets/robot/prototype-top.JPG" width="700">
+<img src="../../assets/robot/prototype-top.jpg" width="700">
 </p>
 
 The image above shows the current prototype during the hardware integration stage.
