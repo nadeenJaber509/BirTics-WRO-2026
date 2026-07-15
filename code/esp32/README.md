@@ -1,38 +1,37 @@
-# ESP32 Arduino Code
+# ESP32 Firmware
 
-This directory contains the ESP32 firmware developed for the BirTics WRO 2026 Future Engineers robot.
+This directory contains the Arduino source code developed for the ESP32 controller used in the BirTics WRO 2026 robot.
 
-The software is organized into two categories:
+The implementation is organized into reusable modules and individual hardware validation programs.
 
-- Main robot firmware
-- Individual hardware validation sketches
+---
 
-## Main Firmware
+# Contents
 
-| File | Description |
+| Item | Description |
 |------|-------------|
-| `main_esp32.ino` | Main robot control program |
-| `config.h` | Pin definitions and system configuration |
-| `sensors.h` | Sensor function declarations |
-| `sensors.cpp` | Sensor implementations |
+| `main_esp32.ino` | Main firmware entry point. |
+| `config.h` | GPIO definitions and configuration constants. |
+| `sensors.cpp` | Sensor implementation. |
+| `sensors.h` | Sensor interface declarations. |
 
 ---
 
-## Hardware Validation Sketches
+# Hardware Validation Programs
 
-These sketches were used during development to verify each hardware subsystem independently before integrating the complete robot.
+Each subsystem was tested independently before integration into the complete robot.
 
-| Sketch | Purpose |
+| Folder | Purpose |
 |---------|---------|
-| `tof-single-test` | Test a single VL6180X Time-of-Flight sensor |
-| `tof-three-sensors-test` | Test three VL6180X sensors using software address assignment |
-| `motor-driver-test` | Verify the L298N motor driver and DC motor operation |
-| `color-sensor-test` | Test the TCS3200 color sensor and RGB readings |
+| `tof-single-test` | Validation of one VL6180X sensor. |
+| `tof-three-sensors-test` | Validation of three VL6180X sensors with dynamic I²C addressing. |
+| `motor-driver-test` | L298N wiring and motor control validation. |
+| `color-sensor-test` | TCS3200 communication and color sensor testing. |
 
 ---
 
-## Development Approach
+# Development Approach
 
-Each subsystem was tested separately before integration into the main robot software.
+The firmware follows an incremental development strategy.
 
-This approach helped identify wiring, communication, and hardware issues early in the development process while keeping the final software easier to debug and maintain.
+Individual hardware components are validated independently before being integrated into the main autonomous driving software. This approach simplifies debugging and improves software reliability.
