@@ -322,6 +322,57 @@ Several engineering observations were obtained during the hardware validation pr
 
 ---
 
+# Current Engineering Challenges
+
+Although the major hardware subsystems have been validated individually, several integration challenges remain before completing the robot.
+
+## 1. Power Switch Integration
+
+The current prototype still requires the final integration of the main power switch.
+
+The remaining work focuses on:
+
+- Selecting the final mounting location.
+- Organizing the power wiring.
+- Ensuring reliable power distribution to all electronic subsystems.
+
+**Status:** In Progress
+
+---
+
+## 2. Two TCS3200 Sensors Integration
+
+The ESP32 expansion shield provides limited accessible headers for connecting two TCS3200 color sensors simultaneously.
+
+The current work focuses on reorganizing the GPIO allocation and wiring while maintaining compatibility with the remaining sensors.
+
+Possible solutions under evaluation include:
+
+- Reassigning GPIO pins.
+- Using direct jumper-wire connections instead of shield headers.
+- Optimizing the overall wiring layout.
+
+**Status:** Under Evaluation
+
+---
+
+## 3. Bottom Color Sensor Mounting
+
+The second color sensor is intended to face the playing field.
+
+The current chassis provides limited clearance underneath the robot, making the mechanical installation challenging.
+
+The mounting solution must:
+
+- Maintain a constant distance from the floor.
+- Protect the sensor from impacts.
+- Avoid interfering with the steering mechanism and ground clearance.
+
+Several mounting positions are currently being evaluated before manufacturing the final bracket.
+
+**Status:** Prototype Development
+
+
 # Future Work
 
 The next hardware validation stage will focus on:
