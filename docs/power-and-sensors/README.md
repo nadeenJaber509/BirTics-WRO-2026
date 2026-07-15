@@ -42,7 +42,7 @@ The current sensor placement was selected after several prototype iterations to 
 
 The robot uses three VL6180X Time-of-Flight sensors to estimate distances to the walls and obstacles, together with two color sensors used for traffic sign detection and line recognition.
 
-![Sensor Placement](../../assets/diagrams/sensor-placement.png)
+![Sensor Placement](../../assets/diagrams/sensor-placement.jpeg)
 
 | Sensor | Position | Purpose |
 |----------|----------|----------|
