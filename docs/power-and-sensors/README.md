@@ -34,6 +34,13 @@ The current prototype includes:
 - Battery and regulated power supply
 
 ---
+# Current Hardware
+
+The photographs below show the current electronics integrated into the prototype.
+
+### Electronic Components
+
+![Components](../../assets/electronics/components-overview.JPG)
 ---
 
 # Sensor Layout
