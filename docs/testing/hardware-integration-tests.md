@@ -236,8 +236,7 @@ Motor motion validation will be completed after updating the final GPIO allocati
 
 ### Status
 
-🟡 Wiring verified — motion testing pending
-
+✅ Motor rotation verified
 ---
 
 # 5. TCS3200 Color Sensor
@@ -305,8 +304,8 @@ Moving the output signal to **GPIO34** and reducing the output frequency to **2%
 |------------|---------------|-----------------|--------------------|
 | ESP32 | ✅ | ✅ | ✅ |
 | VL6180X Sensors | ✅ | ✅ | ✅ |
-| L298N Motor Driver | ✅ | 🟡 | 🟡 |
-| TCS3200 Color Sensor | ✅ | ✅ | 🟡 |
+| L298N Motor Driver | ✅ | ✅ | ✅ |
+| TCS3200 Color Sensor | ✅ | ✅ | ✅ |
 
 ---
 
