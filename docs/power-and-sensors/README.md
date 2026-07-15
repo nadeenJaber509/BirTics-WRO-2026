@@ -34,6 +34,24 @@ The current prototype includes:
 - Battery and regulated power supply
 
 ---
+---
+
+# Sensor Layout
+
+The current sensor placement was selected after several prototype iterations to provide reliable obstacle detection and track perception while satisfying the WRO Future Engineers field dimensions.
+
+The robot uses three VL6180X Time-of-Flight sensors to estimate distances to the walls and obstacles, together with two color sensors used for traffic sign detection and line recognition.
+
+![Sensor Placement](../../assets/diagrams/sensor-placement.png)
+
+| Sensor | Position | Purpose |
+|----------|----------|----------|
+| Front ToF | Front center | Detect front obstacles |
+| Left ToF | Left side | Measure left wall distance |
+| Right ToF | Right side | Measure right wall distance |
+| Front Color Sensor | Front | Detect red and green traffic signs |
+| Bottom Color Sensor | Bottom | Detect floor markings |
+
 
 # Design Philosophy
 
