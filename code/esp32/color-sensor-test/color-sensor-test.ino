@@ -6,74 +6,61 @@
  * S1  = GPIO 19
  * S2  = GPIO 16
  * S3  = GPIO 17
- * OUT = GPIO 4
+ * OUT = GPIO 34
  *
  * The sensor output is a frequency signal.
- * pulseIn() measures the pulse duration.
+ * pulseIn() measures the LOW pulse duration.
  *
- * Smaller values usually mean stronger reflected light.
+ * Frequency scaling:
+ * S0 = LOW
+ * S1 = HIGH
+ * This configures 2% output-frequency scaling.
  */
 
 #define S0 18
 #define S1 19
 #define S2 16
 #define S3 17
-#define SENSOR_OUT 4
+#define SENSOR_OUT 34
 
-unsigned long readColorFilter(
-  bool s2State,
-  bool s3State
-) {
+unsigned long readColorPulse(bool s2State, bool s3State) {
   digitalWrite(S2, s2State);
   digitalWrite(S3, s3State);
 
-  delay(50);
+  delay(80);
 
-  // Return 0 if no pulse is received within 100 ms.
-  return pulseIn(SENSOR_OUT, LOW, 100000);
-}
-
-unsigned long readRed() {
-  return readColorFilter(LOW, LOW);
-}
-
-unsigned long readBlue() {
-  return readColorFilter(LOW, HIGH);
-}
-
-unsigned long readGreen() {
-  return readColorFilter(HIGH, HIGH);
+  return pulseIn(SENSOR_OUT, LOW, 200000);
 }
 
 void setup() {
   Serial.begin(115200);
+  delay(1000);
 
   pinMode(S0, OUTPUT);
   pinMode(S1, OUTPUT);
   pinMode(S2, OUTPUT);
   pinMode(S3, OUTPUT);
-
   pinMode(SENSOR_OUT, INPUT);
 
-  // Configure the TCS3200 for 20% frequency scaling.
-  digitalWrite(S0, HIGH);
-  digitalWrite(S1, LOW);
+  // 2% frequency scaling for easier measurement
+  digitalWrite(S0, LOW);
+  digitalWrite(S1, HIGH);
 
-  Serial.println("TCS3200 color sensor test started.");
+  Serial.println("TCS3200 test started");
 }
 
 void loop() {
-  unsigned long red = readRed();
-  unsigned long green = readGreen();
-  unsigned long blue = readBlue();
+  unsigned long red = readColorPulse(LOW, LOW);
+  unsigned long blue = readColorPulse(LOW, HIGH);
+  unsigned long green = readColorPulse(HIGH, HIGH);
 
   Serial.print("R: ");
   Serial.print(red);
 
-  Serial.print("  G: ");
+  Serial.print(" | G: ");
   Serial.print(green);
 
-  Serial.print("  B: ");
+  Serial.print(" | B: ");
   Serial.println(blue);
 
   delay(500);
