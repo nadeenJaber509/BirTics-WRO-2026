@@ -1,47 +1,43 @@
 # Robot Prototype Images
 
-This folder contains photographs documenting the current mechanical prototype of the BirTics WRO 2026 robot.
-
-The images are referenced throughout the documentation to illustrate the robot's mechanical development and hardware integration.
+This folder contains photographs documenting the current BirTics WRO 2026 robot prototype during the hardware integration stage.
 
 ---
 
 ## Current Prototype
 
-### Front View
+### Perspective View
 
-![Front](prototype-front.jpg)
+![Prototype](prototype-perspective-1.JPG)
+
+---
+
+### Perspective View (Alternative)
+
+![Prototype](prototype-perspective-2.JPG)
 
 ---
 
 ### Top View
 
-![Top](prototype-top.jpg)
+![Top View](prototype-top.jpg)
 
 ---
 
-### Perspective View
+### Chassis Layout
 
-![Perspective 1](prototype-perspective-1.jpg)
-
----
-
-### Perspective View (Opposite Side)
-
-![Perspective 2](prototype-perspective-2.jpg)
+![Chassis](prototype-v1-top.jpeg)
 
 ---
 
-### Rear Drive Assembly
+### Front Section
 
-The rear axle is driven by a DC geared motor mounted inside the rear chassis.
-
-![Rear Drive](rear-drive.jpg)
+![Front](prototype-v1-bottom.jpeg)
 
 ---
 
 ### Battery Placement
 
-Current battery location used during prototype development.
+The battery is currently mounted at the rear of the chassis to improve weight distribution while leaving space for the front steering mechanism and sensors.
 
-![Battery](battery-placement.jpg)
+![Battery](battery-placement.JPG)
