@@ -169,9 +169,9 @@ Each sensor was connected to an independent shutdown (SHUT) pin.
 Initialization sequence:
 
 1. Disable all sensors.
-2. Enable the first sensor and assign address 0x30.
-3. Enable the second sensor and assign address 0x31.
-4. Enable the third sensor and assign address 0x32.
+2. Enable the first sensor and assign address **0x30**.
+3. Enable the second sensor and assign address **0x31**.
+4. Enable the third sensor and assign address **0x32**.
 
 ## Initial Output
 
@@ -218,7 +218,7 @@ Verify the wiring of the L298N H-Bridge before integrating it into the robot.
 | GPIO 27 | IN2 |
 | GND | GND |
 
-The drive motor was connected to OUT1 and OUT2.
+The drive motor was connected to **OUT1** and **OUT2**.
 
 The ESP32 and L298N shared a common ground.
 
@@ -232,7 +232,7 @@ The final integrated firmware therefore requires an updated motor driver pin ass
 
 The wiring configuration was completed successfully.
 
-Motor motion validation will be completed after updating the final GPIO map.
+Motor motion validation will be completed after updating the final GPIO allocation.
 
 ### Status
 
@@ -244,52 +244,43 @@ Motor motion validation will be completed after updating the final GPIO map.
 
 ## Objective
 
-Verify communication between the ESP32 and one TCS3200 color sensor.
+Verify communication between the ESP32 and a TCS3200 color sensor.
 
-## Configuration
+## Final Configuration
 
 | Signal | ESP32 Pin |
-|---------|------------|
+|---------|-----------|
 | S0 | GPIO 18 |
 | S1 | GPIO 19 |
 | S2 | GPIO 16 |
 | S3 | GPIO 17 |
-| OUT | GPIO 4 |
+| OUT | GPIO 34 |
 | VCC | 3.3 V |
 | GND | GND |
 
-## Initial Problem
+The sensor was configured using **2% output frequency scaling**.
 
-After correcting the ESP32 boot configuration, the sensor produced mostly zero readings:
+## Results
 
-```text
-R: 0  G: 0  B: 0
-```
+After updating the wiring and configuration, the ESP32 successfully received stable RGB pulse measurements from the TCS3200 sensor.
 
-Occasionally the sensor returned
+The working configuration used:
 
-```text
-R: 0  G: 340  B: 0
-```
+- S0 = LOW
+- S1 = HIGH
+- OUT connected to GPIO34
 
-## Interpretation
+Different coloured objects produced different pulse durations, confirming successful communication between the ESP32 and the sensor.
 
-The sensor output indicated that no stable frequency signal was being received.
+## Engineering Observation
 
-Possible causes include:
+The initial configuration produced unstable or zero readings.
 
-- Loose wiring
-- Incorrect OUT connection
-- Missing common ground
-- Incorrect power connection
-- Disabled illumination LEDs
-- Unstable signal output
-
-Further investigation is still required.
+Moving the output signal to **GPIO34** and reducing the output frequency to **2% scaling** significantly improved the stability of the measurements.
 
 ### Status
 
-🟡 Under investigation
+✅ Passed
 
 ---
 
@@ -303,8 +294,19 @@ Further investigation is still required.
 | Three VL6180X Sensors | ✅ Passed |
 | L298N Wiring | 🟡 Verified |
 | Motor Rotation | ⏳ Pending |
-| TCS3200 Initial Test | 🟡 Under Investigation |
+| TCS3200 Communication | ✅ Passed |
 | Complete Hardware Integration | ⏳ In Progress |
+
+---
+
+# Test Completion Overview
+
+| Subsystem | Communication | Functional Test | Integration Status |
+|------------|---------------|-----------------|--------------------|
+| ESP32 | ✅ | ✅ | ✅ |
+| VL6180X Sensors | ✅ | ✅ | ✅ |
+| L298N Motor Driver | ✅ | 🟡 | 🟡 |
+| TCS3200 Color Sensor | ✅ | ✅ | 🟡 |
 
 ---
 
@@ -327,7 +329,7 @@ The next hardware validation stage will focus on:
 
 - Updating the final ESP32 GPIO allocation.
 - Completing L298N motor motion testing.
-- Calibrating the TCS3200 color sensor.
-- Testing both color sensors simultaneously.
+- Performing colour calibration under different lighting conditions.
+- Testing both colour sensors simultaneously.
 - Integrating all sensors into the main autonomous driving software.
 - Performing complete robot-level hardware integration tests.
