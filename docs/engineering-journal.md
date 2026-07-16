@@ -692,7 +692,24 @@ The current ESP32 expansion shield provides a limited number of convenient conne
 
 Additional wiring solutions are being investigated to support both color sensors together with the remaining electronic modules.
 
----
+## 16 July 2026 — Improving Color Sensor Wiring
+
+### Challenge
+
+During the hardware integration stage, connecting both TCS3200 color sensors became difficult because the ESP32 expansion shield did not provide enough convenient connection points.
+
+This resulted in crowded wiring and made sensor installation less reliable.
+
+### Engineering Decision
+
+Instead of adding more direct jumper-wire connections, we selected an **I²C Expansion Board** to provide additional connection points and improve cable organization.
+
+This solution simplifies wiring, reduces cable congestion, and makes future maintenance easier.
+
+### Current Status
+
+- ✅ I²C Expansion Board selected.
+- 🔄 Final wiring integration in progress.
 
 ## Next Development Steps
 
