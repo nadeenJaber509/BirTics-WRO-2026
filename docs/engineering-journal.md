@@ -49,13 +49,15 @@ The objective is to document not only the final robot, but also the reasoning be
 | 🌱 **Where It All Started** | Initial project vision and early planning |
 | 🛠️ **Building the First Prototype** | First hardware implementation and lessons learned |
 | 🔄 **A Change in Direction** | Why the original concept evolved |
+| 🚗 **Moving to a Car-Like Platform** | Transition to the RC steering chassis |
 | 🧠 **Choosing the Right Controller** | Raspberry Pi vs ESP32 |
 | 📏 **Searching for More Reliable Sensors** | IR versus ToF evaluation |
-| 🚗 **Moving to a Car-Like Platform** | Transition to the RC steering chassis |
+| 🛒 **Acquiring the New Hardware** | Sourcing components for the new architecture |
 | 🗂️ **Documentation Becomes Part of Engineering** | How documentation became part of development |
 | 🔄 **Design Evolution** | Visual summary of the project's progression |
-| ⚙️ **Current Architecture** | Current hardware status |
-| 🔧 **Hardware Integration Stage** | Current development objectives |
+| ⚙️ **Current Development Status** | Current hardware status |
+| 🏁 **Preparing for the Trial Competition** | Preparation for the upcoming trial event |
+| 🔧 **Hardware Integration Progress (16 July 2026)** | Latest integration milestone |
 | 🔍 **Engineering Reflections** | Lessons learned |
 | 🚀 **Looking Ahead** | Future development roadmap |
 
@@ -76,6 +78,7 @@ The objective is to document not only the final robot, but also the reasoning be
 **— Team BirTics**
 
 </div>
+
 # 🌱 Where It All Started
 
 Every engineering project begins with an idea.
@@ -100,7 +103,8 @@ Looking back, this shift was one of the most valuable decisions we made during t
 > One of the earliest lessons we learned was that engineering documentation should evolve alongside the robot itself. Recording the reasoning behind design decisions proved just as important as documenting the final implementation.
 
 ---
- # 🛠️ Building the First Prototype
+
+# 🛠️ Building the First Prototype
 
 With the project's initial direction becoming clearer, the team agreed that the next step was **not** to build the final robot immediately.
 
@@ -297,53 +301,6 @@ Most importantly, it provided a stronger foundation for building the competition
 
 ---
 
-# 🛒 Acquiring the New Hardware
-
-After selecting the RC steering chassis as the new mechanical platform, the next step was acquiring the components required for the new robot architecture.
-
-Rather than purchasing every component at once, the team focused on obtaining the essential hardware needed to begin mechanical assembly and subsystem testing.
-
-The first hardware set included:
-
-- RC steering chassis
-- ESP32 DevKit V1
-- Expansion shield
-- L298N motor driver
-- Power components
-- Initial sensor modules
-
-> [!NOTE]
-> **Additional Documentation**
->
-> A complete list of the selected hardware components, cost analysis, quantities, and engineering selection rationale is available in:
->
-> 📄 [Robot Parts Cost & Selection Rationale](../mechanical-design/WRO_2026_Robot_Parts_Cost_and_Selection_Rationale.pdf)
-
-Receiving the components marked the transition from planning into practical implementation. For the first time, the team could begin assembling the new robot and evaluating how the selected hardware fit together.
-
-Rather than considering the assembly process as straightforward, several adjustments were required while exploring component placement, cable routing, and available installation space.
-
-<p align="center">
-<img src="../assets/electronics/components-overview.JPG" width="420">
-
-<img src="../assets/electronics/rc-chassis-selection.jpeg" width="420">
-</p>
-
-<p align="center">
-<b>Figure 4.</b> Main hardware components acquired for the new robot platform before assembly.
-</p>
-
-<p align="center">
-<img src="../assets/robot/prototype-perspective-1.JPG" width="420">
-
-<img src="../assets/robot/prototype-perspective-2.JPG" width="420">
-</p>
-
-<p align="center">
-<b>Figure 5.</b> Early assembly of the RC-based prototype after receiving the hardware components.
-</p>
----
-
 # 🧠 Choosing the Right Controller
 
 With the mechanical direction of the project becoming clearer, the next major decision was selecting the robot's main controller.
@@ -412,13 +369,6 @@ Since the robot must operate autonomously, accurate and consistent distance meas
 Rather than selecting the first available sensor, we compared different technologies and evaluated how well they matched the project's requirements.
 
 ---
-### First ToF Integration
-
-Following the sensor selection process, the team began integrating the selected Time-of-Flight sensors into the robot.
-
-This marked the transition from architectural planning to practical implementation. The initial work focused on wiring, communication testing, and verifying that the sensors could be reliably read by the ESP32 before they became part of the navigation system.
-
-At this stage, the objective is to validate the sensing hardware rather than evaluate the robot's navigation performance.
 
 ## Initial Consideration
 
@@ -485,6 +435,53 @@ Rather than avoiding the problem by selecting simpler hardware, we decided that 
 > Engineering is often about balancing performance and complexity. In this case, the team chose a more capable sensing solution, accepting additional programming effort to achieve higher-quality navigation data.
 
 ---
+# 🛒 Acquiring the New Hardware
+
+After finalizing the chassis, controller, and sensor strategy, the next step was acquiring the components required to build the new robot architecture.
+
+Rather than purchasing every component at once, the team focused on obtaining the essential hardware needed to begin mechanical assembly and subsystem testing.
+
+The first hardware set included:
+
+- RC steering chassis
+- ESP32 DevKit V1
+- Expansion shield
+- L298N motor driver
+- Power components
+- Initial sensor modules
+
+> [!NOTE]
+> **Additional Documentation**
+>
+> A complete list of the selected hardware components, cost analysis, quantities, and engineering selection rationale is available in:
+>
+> 📄 [Robot Parts Cost & Selection Rationale](../docs/mechanical-design/WRO_2026_Robot_Parts_Cost_and_Selection_Rationale.pdf)
+
+Receiving the components marked the transition from planning into practical implementation. For the first time, the team could begin assembling the new robot and evaluating how the selected hardware fit together.
+
+Rather than considering the assembly process as straightforward, several adjustments were required while exploring component placement, cable routing, and available installation space.
+
+<p align="center">
+<img src="../assets/electronics/components-overview.JPG" width="420">
+
+<img src="../assets/electronics/rc-chassis-selection.jpeg" width="420">
+</p>
+
+<p align="center">
+<b>Figure 4.</b> Main hardware components acquired for the new robot platform before assembly.
+</p>
+
+<p align="center">
+<img src="../assets/robot/prototype-perspective-1.JPG" width="420">
+
+<img src="../assets/robot/prototype-perspective-2.JPG" width="420">
+</p>
+
+<p align="center">
+<b>Figure 5.</b> Early assembly of the RC-based prototype after receiving the hardware components.
+</p>
+---
+
 # 🗂️ Documentation Becomes Part of Engineering
 
 As the project evolved, we noticed that the robot itself was not the only thing becoming more complex—our engineering decisions were as well.
@@ -610,21 +607,7 @@ Each future improvement is expected to build upon the engineering decisions alre
 
 As the project moved from planning toward implementation, the team's focus shifted to preparing the robot for the upcoming **WRO Trial Competition**, scheduled for **13 July 2026**.
 
-Unlike the initial prototype, this stage emphasizes integrating the selected hardware and validating the engineering decisions made throughout the project.
-
-The trial competition represents the first opportunity to evaluate the new robot configuration under conditions closer to the official competition.
-
-At the time of writing, the team is actively integrating the newly selected Time-of-Flight (ToF) sensors with the ESP32 controller. The current work focuses on wiring, communication testing, and validating the sensors before they become part of the robot's navigation system.
-
-<p align="center">
-<img src="../assets/testing/tof-integration-testing.jpg" width="700">
-</p>
-
-<p align="center">
-<b>Figure X.</b> Initial integration and validation of the VL6180X Time-of-Flight sensor with the ESP32 during preparation for the WRO Trial Competition.
-</p>
-
----
+Unlike the initial prototype, this stage emphasizes integrating the selected hardware and validating the engineering decisions made throughout the project. The trial competition represents the first opportunity to evaluate the new robot configuration under conditions closer to the official competition.
 
 ## Current Development Focus
 
@@ -637,6 +620,14 @@ At the time of writing, the team is actively working on:
 
 Unlike the first prototype, which relied on ultrasonic sensors, the current robot introduces ToF sensors as part of the updated sensing strategy. This requires both hardware integration and software validation before full autonomous testing can begin.
 
+<p align="center">
+<img src="../assets/testing/tof-integration-testing.jpg" width="700">
+</p>
+
+<p align="center">
+<b>Figure X.</b> Initial integration and validation of the VL6180X Time-of-Flight sensor with the ESP32 during preparation for the WRO Trial Competition.
+</p>
+
 ---
 
 ## Engineering Goal
@@ -648,21 +639,10 @@ The observations collected during this stage will guide future refinements in bo
 > [!NOTE]
 > This section reflects the project's current development stage. The trial competition has not yet taken place, and this journal will be updated afterward with the test results, observations, and any engineering decisions that follow.
 
+---
+# 🔧 Hardware Integration Progress — 16 July 2026
 
-# 🔍 Engineering Reflections
-
-Throughout this project, we learned that engineering is an iterative process rather than a straight path to a final solution.
-
-Every prototype, design revision, and technical discussion helped us reduce uncertainty and make more informed decisions. Instead of aiming for a perfect design from the beginning, we focused on continuous improvement supported by testing, documentation, and teamwork.
-
-Looking back, the most valuable outcome has not only been the robot itself, but also the engineering experience gained while developing it.
-
-
-# 📅 July 16, 2026
-
-## Hardware Integration Progress
-
-This stage represents the first complete hardware integration of the current RC platform.
+This milestone documents the first large-scale integration of the selected hardware after completing the component acquisition phase.
 
 The ESP32 expansion shield, motor driver, battery, steering system, and sensor modules were temporarily assembled to evaluate mechanical compatibility, wiring layout, and available installation space before permanent mounting.
 
@@ -724,7 +704,16 @@ The next hardware iteration will focus on:
 - Organizing cable routing.
 - Performing complete robot integration tests.
 
+---
+# 🔍 Engineering Reflections
 
+Throughout this project, we learned that engineering is an iterative process rather than a straight path to a final solution.
+
+Every prototype, design revision, and technical discussion helped us reduce uncertainty and make more informed decisions. Instead of aiming for a perfect design from the beginning, we focused on continuous improvement supported by testing, documentation, and teamwork.
+
+Looking back, the most valuable outcome has not only been the robot itself, but also the engineering experience gained while developing it.
+
+---
 # 🚀 Looking Ahead
 
 The engineering journey of Team BirTics is still ongoing.
@@ -741,7 +730,6 @@ The next stages of development will continue documenting:
 - Engineering decisions resulting from future testing
 
 Rather than documenting only the final robot, this journal will continue to record the reasoning behind its evolution.
-
 
 <div align="center">
 
