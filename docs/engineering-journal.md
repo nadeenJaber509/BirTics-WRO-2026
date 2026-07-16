@@ -55,7 +55,7 @@ The objective is to document not only the final robot, but also the reasoning be
 | 🗂️ **Documentation Becomes Part of Engineering** | How documentation became part of development |
 | 🔄 **Design Evolution** | Visual summary of the project's progression |
 | ⚙️ **Current Architecture** | Current hardware status |
-| 🏁 **Preparing for the Trial Competition** | Current development objectives |
+| 🔧 **Hardware Integration Stage** | Current development objectives |
 | 🔍 **Engineering Reflections** | Lessons learned |
 | 🚀 **Looking Ahead** | Future development roadmap |
 
@@ -140,7 +140,7 @@ Although simple, this approach enabled the team to verify the basic principles o
 
 ---
 <p align="center">
-  <img src="../assets/prototype-v1-top.jpeg" width="650">
+  <img src="../assets/robot/prototype-v1-top.jpeg" width="650">
 </p>
 
 <p align="center">
@@ -150,7 +150,7 @@ Although simple, this approach enabled the team to verify the basic principles o
 ---
 
 <p align="center">
-  <img src="../assets/prototype-v1-bottom.jpeg" width="650">
+  <img src="../assets/robot/prototype-v1-bottom.jpeg" width="650">
 </p>
 
 <p align="center">
@@ -262,10 +262,9 @@ The new chassis offered:
 Most importantly, it provided a stronger foundation for building the competition robot rather than continuing to develop a temporary prototype.
 
 <p align="center">
-  <img src="../assets/rc-chassis-selection.jpeg" width="650">
-</p>
-
+     <img src="../assets/electronics/rc-chassis-selection.jpeg"></p>
 <p align="center">
+     
 <b>Figure 3.</b> Ready-made RC steering chassis adopted as the new mechanical platform following the evaluation of the initial differential-drive prototype.
 </p>
 ---
@@ -297,6 +296,54 @@ Most importantly, it provided a stronger foundation for building the competition
 > Choosing the right mechanical platform early creates a stronger foundation for every hardware and software decision that follows.
 
 ---
+
+# 🛒 Acquiring the New Hardware
+
+After selecting the RC steering chassis as the new mechanical platform, the next step was acquiring the components required for the new robot architecture.
+
+Rather than purchasing every component at once, the team focused on obtaining the essential hardware needed to begin mechanical assembly and subsystem testing.
+
+The first hardware set included:
+
+- RC steering chassis
+- ESP32 DevKit V1
+- Expansion shield
+- L298N motor driver
+- Power components
+- Initial sensor modules
+
+> [!NOTE]
+> **Additional Documentation**
+>
+> A complete list of the selected hardware components, cost analysis, quantities, and engineering selection rationale is available in:
+>
+> 📄 [Robot Parts Cost & Selection Rationale](../mechanical-design/WRO_2026_Robot_Parts_Cost_and_Selection_Rationale.pdf)
+
+Receiving the components marked the transition from planning into practical implementation. For the first time, the team could begin assembling the new robot and evaluating how the selected hardware fit together.
+
+Rather than considering the assembly process as straightforward, several adjustments were required while exploring component placement, cable routing, and available installation space.
+
+<p align="center">
+<img src="../assets/electronics/components-overview.JPG" width="420">
+
+<img src="../assets/electronics/rc-chassis-selection.jpeg" width="420">
+</p>
+
+<p align="center">
+<b>Figure 4.</b> Main hardware components acquired for the new robot platform before assembly.
+</p>
+
+<p align="center">
+<img src="../assets/robot/prototype-perspective-1.JPG" width="420">
+
+<img src="../assets/robot/prototype-perspective-2.JPG" width="420">
+</p>
+
+<p align="center">
+<b>Figure 5.</b> Early assembly of the RC-based prototype after receiving the hardware components.
+</p>
+---
+
 # 🧠 Choosing the Right Controller
 
 With the mechanical direction of the project becoming clearer, the next major decision was selecting the robot's main controller.
@@ -570,7 +617,7 @@ The trial competition represents the first opportunity to evaluate the new robot
 At the time of writing, the team is actively integrating the newly selected Time-of-Flight (ToF) sensors with the ESP32 controller. The current work focuses on wiring, communication testing, and validating the sensors before they become part of the robot's navigation system.
 
 <p align="center">
-<img src="../assets/tof-integration-testing.jpg" width="700">
+<img src="../assets/testing/tof-integration-testing.jpg" width="700">
 </p>
 
 <p align="center">
@@ -601,11 +648,6 @@ The observations collected during this stage will guide future refinements in bo
 > [!NOTE]
 > This section reflects the project's current development stage. The trial competition has not yet taken place, and this journal will be updated afterward with the test results, observations, and any engineering decisions that follow.
 
----
-
-# 🧪 Trial Competition Evaluation
-
----
 
 # 🔍 Engineering Reflections
 
@@ -615,20 +657,88 @@ Every prototype, design revision, and technical discussion helped us reduce unce
 
 Looking back, the most valuable outcome has not only been the robot itself, but also the engineering experience gained while developing it.
 
+
+# 📅 July 16, 2026
+
+## Hardware Integration Progress
+
+This stage represents the first complete hardware integration of the current RC platform.
+
+The ESP32 expansion shield, motor driver, battery, steering system, and sensor modules were temporarily assembled to evaluate mechanical compatibility, wiring layout, and available installation space before permanent mounting.
+
+<p align="center">
+<img src="../assets/robot/prototype-integration-2026-07-16.jpg" width="700">
+</p>
+
+<p align="center">
+<b>Figure 5.</b> Hardware integration of the current RC-based prototype during subsystem assembly (16 July 2026).
+</p>
+
+---
+
+## Current Integration Challenges
+
+Several engineering challenges were identified during the integration process.
+
+### 1. Power Switch Integration
+
+The main power switch has not yet been integrated successfully into the power distribution system.
+
+Although the switch is physically connected, the circuit remains powered continuously. Additional investigation is required to identify the correct wiring configuration before permanent installation.
+
+---
+
+### 2. Front Color Sensor Mounting
+
+The front TCS3200 color sensor required several mounting trials.
+
+Different mounting positions were evaluated around the front bumper.
+
+The sensor will most likely be mounted horizontally inside the front bumper area to reduce its visibility while maintaining a clear field of view.
+
+---
+
+### 3. Bottom Color Sensor Mounting
+
+The second TCS3200 sensor still requires a dedicated mechanical mount underneath the chassis.
+
+The challenge is maintaining the recommended sensing distance from the floor while protecting the sensor from contact with the playfield.
+
+---
+
+### 4. Expansion Shield Connection Limits
+
+The current ESP32 expansion shield provides a limited number of convenient connection points.
+
+Additional wiring solutions are being investigated to support both color sensors together with the remaining electronic modules.
+
+---
+
+## Next Development Steps
+
+The next hardware iteration will focus on:
+
+- Completing the power switch wiring.
+- Finalizing the mounting position of both color sensors.
+- Completing the remaining electrical connections.
+- Organizing cable routing.
+- Performing complete robot integration tests.
+
+
 # 🚀 Looking Ahead
 
 The engineering journey of Team BirTics is still ongoing.
 
 The next stage of development will focus on integrating the selected hardware, refining the software, and validating the robot through practical testing.
 
-Following the trial competition, the Engineering Journey will continue to grow by documenting:
+The next stages of development will continue documenting:
 
-- Competition observations.
-- Performance analysis.
-- Design improvements.
-- Mechanical refinements.
-- Software updates.
-- New engineering decisions resulting from testing.
+- Hardware integration
+- Sensor calibration
+- Autonomous navigation testing
+- Mechanical refinements
+- Software improvements
+- Engineering decisions resulting from future testing
 
 Rather than documenting only the final robot, this journal will continue to record the reasoning behind its evolution.
 
