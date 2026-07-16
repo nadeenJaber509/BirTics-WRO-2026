@@ -43,6 +43,7 @@
 BirTics is a team of three engineering students from **Birzeit University, Palestine**, participating in the **WRO Future Engineers 2026** competition.
 
 Each member has a primary responsibility, while major decisions are reviewed by the entire team.
+Although responsibilities are divided, subsystem integration and major engineering decisions are discussed collaboratively to ensure consistency across the complete robot.
 
 | Member       | Primary Role                 | Main Focus                                       |
 | ------------ | ---------------------------- | ------------------------------------------------ |
@@ -266,11 +267,11 @@ Nadeen
 Together, the three roles form one integrated engineering workflow:
 
 ```text
-Mechanical System
+Mechanical Design
         +
-Software System
+Embedded Software
         +
-Testing and Documentation
+Documentation & Validation
         =
 BirTics Autonomous Vehicle
 ```
