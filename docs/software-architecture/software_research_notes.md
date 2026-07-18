@@ -1,36 +1,75 @@
 # Software Research Notes
 
-## OpenCV Lane Detection
+## Overview
 
-Lane detection is used to keep the robot centered on the track.
-The camera captures images continuously and software analyzes the track boundaries.
-The steering angle is adjusted according to the detected lane position.
+This document summarizes the software concepts, design decisions, and engineering approaches researched during the development of the BirTics WRO Future Engineers 2026 robot.
 
-## OpenCV Color Detection
+---
 
-Color detection is used to identify red and green traffic signs.
-The robot must pass red pillars from the right side and green pillars from the left side.
-OpenCV can detect colors using the HSV color space.
+# Sensor-Based Navigation
 
-## PID Steering Control
+Several navigation approaches were evaluated during the planning stage.
 
-PID control helps keep the robot stable while driving.
-The controller calculates steering corrections based on the error between the desired path and the current position.
+The final software architecture uses dedicated sensors instead of a vision-based system, allowing all processing to run directly on the ESP32 while maintaining a simple and efficient design.
 
-## State Machine
+---
 
-The software will be organized using a state machine.
+# Lane Following
 
-States:
+Different lane following methods were investigated before selecting the final approach.
 
-- IDLE
-- FOLLOW_TRACK
-- DETECT_PILLAR
-- AVOID_PILLAR
-- LAP_COUNTING
-- PARKING
-- STOP
+The implemented solution uses two TCS3200 color sensors to monitor the track surface and estimate the robot's position within the lane.
 
-## Notes
+This approach provides fast sensor readings and low computational requirements.
 
-Further research and testing will be added during development.
+---
+
+# Obstacle Detection
+
+Obstacle detection is based on three VL6180X Time-of-Flight (ToF) distance sensors.
+
+The research focused on selecting reliable distance measurements that enable the robot to detect nearby obstacles and perform safe avoidance maneuvers.
+
+---
+
+# PID Control
+
+A PID controller was selected to improve steering stability.
+
+Research focused on:
+
+- Reducing steering oscillation
+- Improving lane tracking accuracy
+- Achieving smooth steering corrections
+- Maintaining stable vehicle motion
+
+---
+
+# Finite State Machine
+
+The robot software is organized as a finite state machine (FSM).
+
+This architecture separates the software into clearly defined operating states, making the control logic easier to understand, maintain, and debug.
+
+---
+
+# Software Modularity
+
+The software is divided into independent modules for:
+
+- Sensor acquisition
+- Lane following
+- Obstacle avoidance
+- PID steering control
+- State management
+- Motor and servo control
+
+This modular design simplifies testing and future software improvements.
+
+---
+
+# Continuous Improvement
+
+The software is continuously evaluated through testing on the competition track.
+
+Observations from each test session are used to refine the navigation algorithm, improve controller performance, and increase the overall reliability of the autonomous vehicle.
