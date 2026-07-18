@@ -2,92 +2,74 @@
 
 ## Purpose
 
-Lane following is the main driving algorithm used to keep the robot moving safely around the track.
+Lane following is the primary navigation algorithm used by the BirTics WRO Future Engineers 2026 robot.
 
-The objective is to keep the robot centered while maintaining stable and smooth movement.
+Its objective is to keep the vehicle centered within the driving lane while maintaining stable and continuous autonomous movement.
 
-## Main Idea
+---
 
-The robot continuously reads information from sensors and/or the camera.
+## Design Overview
 
-Based on the detected position, the software calculates an error value and applies steering corrections using the PID controller.
+The robot uses two TCS3200 color sensors mounted underneath the chassis to monitor the track surface.
+
+During every control cycle, both sensors are read continuously. Their measurements are processed to estimate the robot's position relative to the lane boundaries.
+
+Based on this information, the software calculates the steering correction required to keep the robot on the intended path.
+
+---
 
 ## Sensor Inputs
 
-Possible inputs include:
+Lane following relies on:
 
-- Camera for track detection
-- Distance sensors for wall measurements
-- IMU sensor for orientation support
+- Two TCS3200 color sensors
+- PID steering controller
+- MG996R steering servo
 
-The final configuration will depend on hardware testing and performance.
+Obstacle detection is handled independently by the three VL6180X ToF sensors.
 
-## Camera-Based Lane Following
+---
 
-The camera captures images of the track.
+## Lane Position Estimation
 
-The software processes each frame and determines:
+The software compares the readings obtained from the left and right color sensors.
 
-- Track center
-- Vehicle position relative to the center
-- Required steering correction
+Differences between the two measurements indicate whether the robot has moved toward one side of the lane.
 
-Error is calculated as:
+This information is converted into a steering error that is passed to the PID controller.
 
-```text
-error = lane_center - vehicle_center
-```
+---
 
-The PID controller uses this error to adjust steering.
+## Steering Correction
 
-## Distance Sensor Method
+The calculated lane error is processed by the PID controller.
 
-Distance sensors can also help estimate robot position.
+The controller generates a steering command that adjusts the angle of the MG996R servo, allowing the vehicle to return smoothly toward the center of the lane while minimizing oscillations.
 
-Example:
+---
 
-```text
-error = left_distance - right_distance
-```
+## Continuous Operation
 
-If the robot is closer to one side, steering is adjusted toward the center.
+The lane following algorithm operates continuously throughout the autonomous run.
 
-## PID Integration
+Each control cycle performs the following sequence:
 
-The lane following algorithm sends the calculated error to the PID controller.
+1. Read both color sensors.
+2. Estimate the robot's lane position.
+3. Calculate the steering error.
+4. Compute the PID correction.
+5. Update the steering servo.
+6. Repeat.
 
-The PID controller generates the steering correction needed to keep the robot centered.
+---
 
-## Corner Handling
+## Testing
 
-When approaching a corner:
+The lane following algorithm is evaluated under different driving conditions to verify:
 
-1. Detect change in track direction.
-2. Reduce speed if necessary.
-3. Apply smoother steering corrections.
-4. Return to normal lane following after the turn.
+- Stable steering response
+- Consistent lane tracking
+- Reliable sensor readings
+- Smooth vehicle motion
 
-## Expected Challenges
-
-Possible challenges include:
-
-- Lighting changes
-- Camera noise
-- Sensor inaccuracies
-- Fast corner transitions
-
-These issues will be addressed through testing and tuning.
-
-## Testing Plan
-
-1. Test straight sections.
-2. Test corner sections.
-3. Tune PID values.
-4. Increase speed gradually.
-5. Measure lane tracking stability.
-
-## Current Status
-
-The lane following algorithm is currently in the design stage.
-
-Final implementation details will be completed after hardware selection and initial testing.
+PID parameters are adjusted experimentally to achieve accurate and stable steering performance.
