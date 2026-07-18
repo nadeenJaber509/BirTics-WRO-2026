@@ -2,116 +2,97 @@
 
 ## Purpose
 
-The PID steering controller will be used to keep the robot stable while following the track.  
-Instead of making sudden left or right turns, PID allows the robot to make smooth steering corrections.
+The PID (Proportional–Integral–Derivative) controller is used to provide smooth and stable steering during autonomous navigation.
 
-This is important because the WRO track has straight sections, corners, and random layouts, so the robot needs stable movement.
+Instead of making abrupt steering corrections, the controller continuously adjusts the steering angle to keep the robot centered within the lane while minimizing oscillations.
 
-## Why We Use PID
+---
 
-A simple control method may cause the robot to shake or move in a zig-zag pattern.
+# Why We Use PID
 
-PID is better because it corrects the robot movement based on:
+Small sensor variations can cause unstable steering if corrections are applied directly.
 
-- The current error
-- The accumulated error
-- The rate of change of the error
+The PID controller improves driving performance by considering:
 
-This helps the robot stay closer to the desired path.
+- Current steering error (Proportional)
+- Accumulated error over time (Integral)
+- Rate of change of the error (Derivative)
 
-## Input Sources
+This results in smoother steering and more stable vehicle motion.
 
-The PID error can be calculated using one or more of these inputs:
+---
 
-- Camera lane center detection
-- Left and right distance sensor readings
-- Wall distance measurements
-- IMU readings for turning stability
+# Input Source
 
-The final input method will depend on the selected hardware and testing results.
+The PID controller receives the steering error calculated by the lane following algorithm.
 
-## Error Calculation
+The error is determined using the readings from the two TCS3200 color sensors, which estimate the robot's position relative to the lane.
 
-If camera vision is used:
+---
 
-```text
-error = desired_lane_center - detected_lane_center
-```
+# Error Calculation
 
-If distance sensors are used:
+The lane following module calculates a steering error based on the difference between the left and right color sensor readings.
 
-```text
-error = left_distance - right_distance
-```
+The objective is to keep this error as close to zero as possible.
 
-The goal is to keep the error close to zero.
+---
 
-## PID Formula
+# PID Formula
 
 ```text
-steering_correction = (Kp * error) + (Ki * accumulated_error) + (Kd * error_change)
+steering_correction =
+(Kp × error) +
+(Ki × accumulated_error) +
+(Kd × error_change)
 ```
 
 Where:
 
-- Kp controls how strongly the robot reacts to the current error.
-- Ki corrects long-term accumulated error.
-- Kd reduces sudden changes and helps smooth the steering.
+- **Kp** controls the immediate reaction to the current error.
+- **Ki** compensates for accumulated long-term error.
+- **Kd** reduces rapid changes and improves steering stability.
 
-## Steering Output
+---
 
-The calculated PID correction will be sent to the steering actuator.
+# Steering Output
+
+The computed PID correction is applied to the MG996R steering servo.
 
 ```text
 steering_angle = center_angle + steering_correction
 ```
 
-If the robot moves too far left, the controller will steer it right.
+The steering angle is continuously updated throughout autonomous operation.
 
-If the robot moves too far right, the controller will steer it left.
+---
 
-## Initial Testing Plan
+# PID Tuning
 
-The PID controller will be tested gradually:
+The controller is tuned experimentally using the following approach:
 
-1. Start with low speed.
-2. Test movement on a straight section.
-3. Tune Kp first until the robot reacts correctly.
-4. Add Kd to reduce shaking.
-5. Use Ki only if needed.
-6. Test corners after straight movement becomes stable.
-7. Record problems and update the values based on testing.
+1. Tune **Kp** until the robot responds correctly.
+2. Adjust **Kd** to reduce oscillation.
+3. Introduce **Ki** only if long-term steering bias is observed.
+4. Repeat testing under different driving conditions.
 
-## Expected Challenges
+---
 
-Possible problems during testing:
+# Expected Challenges
 
-- Robot oscillates too much.
-- Robot reacts too slowly.
-- Sensor readings are noisy.
-- Camera detection changes because of lighting.
-- Turns are too sharp or too wide.
+Possible tuning challenges include:
 
-These issues will be handled by tuning PID values and improving sensor filtering.
+- Excessive oscillation
+- Slow steering response
+- Sensor noise
+- Overshooting during steering corrections
 
-## Current Status
+These issues are addressed by adjusting the PID parameters and validating the controller through repeated testing.
 
-The PID controller is still in the design and research stage.  
-Final PID values will be selected after testing the real robot on the track.
+---
 
-```text
-Kp = To be determined during testing
-Ki = To be determined during testing
-Kd = To be determined during testing
-```
+# Integration
 
-## Relation to Other Software Modules
+The PID controller is used by the lane following module to generate steering commands for the MG996R servo.
 
-The PID controller will be used mainly by:
-
-- Lane following module
-- Wall following module
-- Corner handling logic
-- Parking alignment logic
-
-This makes PID one of the main control algorithms in the robot software.
+It operates continuously throughout autonomous navigation and is one of the core control components of the robot software.
