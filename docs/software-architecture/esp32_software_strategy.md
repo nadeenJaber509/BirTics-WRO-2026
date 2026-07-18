@@ -1,57 +1,76 @@
-# ESP32-Only Software Strategy
+# ESP32 Software Strategy
 
 ## Purpose
 
-This document describes the software strategy for using the ESP32 as the main controller of the robot.
+This document describes the software architecture implemented on the ESP32 microcontroller for the BirTics WRO Future Engineers 2026 robot.
 
-The team selected the ESP32-only option as the first implementation because it is lower cost, simpler to wire, and suitable for the selected sensor-based system.
+The ESP32 serves as the central controller, responsible for reading sensor data, processing navigation decisions, and controlling the steering and drive systems in real time.
 
-## Selected Controller
+---
 
-The ESP32 DevKit V1 will be used as the main controller.
+# Main Controller
 
-It will read sensor values, make driving decisions, and send control signals to the motor driver and steering actuator.
+The robot is controlled by a single ESP32 development board.
 
-## Main Hardware Inputs
+The ESP32 is responsible for:
 
-The ESP32 will receive data from:
+- Initializing all hardware modules
+- Reading sensor data
+- Executing the autonomous driving algorithm
+- Controlling the steering servo
+- Controlling the drive motor
+- Managing the robot operating states
 
-- VL53L0X Time-of-Flight distance sensors
-- TCS34725 RGB color sensors
-- TCRT5000 IR reflective sensor
-- MPU-6050 IMU sensor
+---
+
+# Hardware Inputs
+
+The ESP32 receives data from:
+
+- Three VL6180X Time-of-Flight (ToF) distance sensors
+- Two TCS3200 color sensors
 - Start button
 
-## Main Hardware Outputs
+---
 
-The ESP32 will control:
+# Hardware Outputs
 
-- DC motor speed and direction through the L298N motor driver
-- Steering actuator using PWM
-- Stop behavior after completing the mission
+The ESP32 controls:
 
-## Main Software Modules
+- MG996R steering servo
+- DC drive motor through the L298N motor driver
 
-The software will be divided into modules:
+---
 
-- Start and safety logic
-- Sensor reading
-- Wall following
-- PID steering control
-- Color detection
+# Software Modules
+
+The software is divided into several functional modules:
+
+- System initialization
+- Sensor acquisition
+- Lane following
+- Obstacle detection
 - Obstacle avoidance
-- Lap counting
-- Parking logic
-- Motor and steering control
+- Steering control
+- Motor control
+- State machine
+- Safety monitoring
 
-## Driving Strategy
+---
 
-The robot will use sensor-based navigation instead of camera-based OpenCV.
+# Main Control Loop
 
-The main movement algorithm will depend on distance readings from the ToF sensors.
+During autonomous operation, the ESP32 continuously performs the following sequence:
 
-The robot will try to keep a safe distance from the walls and use PID control to make steering smoother.
+1. Read all sensor values.
+2. Process lane information.
+3. Detect nearby obstacles.
+4. Calculate the steering command.
+5. Update the steering servo.
+6. Control the drive motor.
+7. Repeat until the mission is completed.
 
+This continuous control loop allows the robot to react quickly to changes in the environment while maintaining stable autonomous navigation.
 ## Obstacle Strategy
 
 The TCS34725 color sensors will be used to detect red and green pillars.
