@@ -2,45 +2,49 @@
 
 Welcome to the **Software Architecture** section of the **BirTics WRO Future Engineers 2026** repository.
 
-This directory contains the software design, control strategy, navigation algorithms, and supporting documentation used to develop the autonomous robot.
+This directory contains the software design, system architecture, navigation strategy, control algorithms, and implementation documentation for our autonomous vehicle developed for the WRO Future Engineers 2026 competition.
 
-Use the links below to navigate through the available documents.
+Each document explains a specific part of the robot software, from sensor processing and decision making to vehicle control and autonomous navigation.
 
 ---
 
-# 📂 Documents
+# 📂 Documentation
 
 | Document | Description |
 |----------|-------------|
-| 🧠 [Algorithms Plan](algorithms_plan.md) | High-level overview of the complete software pipeline and planned algorithms. |
-| ⚙️ [ESP32 Software Strategy](esp32_software_strategy.md) | Software architecture implemented on the ESP32 controller. |
-| 🛣️ [Lane Following Design](lane_following_design.md) | Lane detection and vehicle guidance strategy. |
-| 🚧 [Obstacle Avoidance Strategy](obstacle_avoidance_strategy.md) | Logic used to detect and avoid obstacles during autonomous driving. |
-| 🎯 [PID Controller](pid_controller.md) | PID control strategy for steering and motion stability. |
-| 📡 [Sensor Requirements](sensor_requirements.md) | Sensors used by the software and their functional requirements. |
-| 🔄 [Software Flowchart](software_flowchart.md) | Overall software execution flow and decision process. |
-| 📚 [Software Research Notes](software_research_notes.md) | Research findings, references, and implementation notes. |
-| 🔀 [State Machine](state_machine.md) | Robot operating states and transitions during execution. |
+| 🧠 [Algorithms Plan](algorithms_plan.md) | Complete autonomous driving algorithm and overall software workflow. |
+| ⚙️ [ESP32 Software Strategy](esp32_software_strategy.md) | Software architecture implemented on the ESP32 microcontroller. |
+| 🛣️ [Lane Following Design](lane_following_design.md) | Detection of lane boundaries and steering strategy using the two color sensors. |
+| 🚧 [Obstacle Avoidance Strategy](obstacle_avoidance_strategy.md) | Obstacle detection using the three ToF sensors and the corresponding avoidance logic. |
+| 🎯 [PID Controller](pid_controller.md) | Steering PID controller used to improve driving stability and lane tracking. |
+| 📡 [Sensor Requirements](sensor_requirements.md) | Description of all sensors, their roles, and software interface requirements. |
+| 🔄 [Software Flowchart](software_flowchart.md) | Overall execution flow of the autonomous driving software. |
+| 📚 [Software Research Notes](software_research_notes.md) | Design decisions, software experiments, and implementation references collected during development. |
+| 🔀 [State Machine](state_machine.md) | Robot operating states and transitions throughout the competition run. |
 
 ---
 
 # 📌 Purpose
 
-This section documents the software architecture developed for the BirTics autonomous vehicle, including:
+The goal of this documentation is to describe the software architecture developed for the BirTics autonomous vehicle and explain how each software module contributes to autonomous operation.
+
+The documentation covers:
 
 - Overall software architecture
-- Navigation algorithms
-- Vehicle control logic
 - Sensor integration
+- Lane following
+- Obstacle detection and avoidance
+- Vehicle control
 - Decision-making process
-- Software state management
-- Control system design
+- State machine implementation
+- ESP32 software organization
 
+---
 
 <div align="center">
 
-**BirTics – WRO Future Engineers 2026**
+## BirTics – WRO Future Engineers 2026
 
-*Software Architecture Documentation*
+**Software Architecture Documentation**
 
 </div>
