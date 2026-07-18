@@ -1,34 +1,100 @@
 # Algorithms Plan
 
-## 1. Lane Following Algorithm
+This document describes the high-level autonomous driving algorithm implemented on the BirTics WRO Future Engineers 2026 robot. The software is designed to continuously process sensor data, make driving decisions in real time, and safely complete the competition track.
 
-The robot will follow the track using distance sensors and/or camera input.
+---
 
-Basic idea:
+# 1. System Initialization
 
-- Read left and right distance.
-- Calculate the error.
-- Use PID control to correct steering.
-- Keep the robot centered between the walls.
+After power-up, the ESP32 initializes all hardware components, including:
 
-## 2. PID Steering
+- Three VL6180X Time-of-Flight (ToF) distance sensors
+- Two TCS3200 color sensors
+- MG996R steering servo
+- DC drive motor
+- L298N motor driver
 
-PID will be used to make steering smoother and reduce shaking.
+Each sensor is checked before the robot enters the waiting state.
 
-Error = target position - current position
+---
 
-The steering correction depends on:
-- P: current error
-- I: accumulated error
-- D: change in error
+# 2. Start Sequence
 
-## 3. Pillar Detection
+The robot waits for the official start signal.
 
-The camera will detect red and green pillars using color detection.
+Once the start button is pressed, autonomous operation begins.
 
-Red pillar:
-- Robot must pass it from the right side.
+---
 
+# 3. Lane Following
+
+The robot continuously reads both color sensors to detect the track boundaries.
+
+The steering angle is adjusted to keep the vehicle centered inside the driving lane.
+
+The lane following algorithm runs continuously throughout the entire competition except when obstacle avoidance temporarily takes priority.
+
+---
+
+# 4. Steering Control
+
+The steering system uses a PID controller to improve stability.
+
+For every control cycle:
+
+- Calculate steering error
+- Compute PID correction
+- Update steering servo angle
+
+This reduces oscillation and provides smoother vehicle motion.
+
+---
+
+# 5. Obstacle Detection
+
+The three ToF sensors continuously monitor the area in front of the vehicle.
+
+The software determines:
+
+- Whether an obstacle is present
+- Its approximate position relative to the vehicle
+- The appropriate avoidance maneuver
+
+---
+
+# 6. Obstacle Avoidance
+
+When an obstacle is detected:
+
+1. Reduce vehicle speed.
+2. Calculate a safe steering path.
+3. Drive around the obstacle.
+4. Return smoothly to the driving lane.
+5. Resume normal lane following.
+
+---
+
+# 7. Continuous Navigation
+
+During the entire run, the robot repeatedly performs the following loop:
+
+- Read sensors
+- Process sensor data
+- Detect lane boundaries
+- Detect obstacles
+- Update steering
+- Control vehicle speed
+- Repeat
+
+This real-time loop allows the robot to react continuously to changes on the track.
+
+---
+
+# 8. Mission Completion
+
+The robot continues autonomous navigation until the competition task has been completed according to the official WRO Future Engineers rules.
+
+At the end of the run, the vehicle stops safely.
 Green pillar:
 - Robot must pass it from the left side.
 
