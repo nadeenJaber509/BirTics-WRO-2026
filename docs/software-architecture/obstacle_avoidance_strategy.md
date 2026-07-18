@@ -2,80 +2,70 @@
 
 ## Purpose
 
-The obstacle avoidance strategy is responsible for detecting traffic signs and passing them according to the WRO Future Engineers rules.
+The obstacle avoidance strategy enables the BirTics WRO Future Engineers 2026 robot to detect obstacles and navigate around them while maintaining safe and stable autonomous operation.
 
-The robot must:
+The robot continuously monitors the area in front of the vehicle and adjusts its trajectory whenever an obstacle is detected.
 
-- Pass red pillars from the right side.
-- Pass green pillars from the left side.
+---
 
-## Detection Method
+# Obstacle Detection
 
-The robot will use a camera and computer vision techniques to detect colored pillars.
+Obstacle detection is performed using three VL6180X Time-of-Flight (ToF) distance sensors.
 
-Possible detection steps:
+The sensors continuously measure the distance between the robot and nearby objects, providing real-time information about the surrounding environment.
 
-1. Capture image from camera.
-2. Convert image to HSV color space.
-3. Detect red and green color regions.
-4. Find pillar position.
-5. Determine the required avoidance path.
+The software compares these distance measurements with predefined thresholds to determine whether an avoidance maneuver is required.
 
-## Red Pillar Strategy
+---
 
-When a red pillar is detected:
+# Avoidance Strategy
 
-1. Confirm detection.
-2. Estimate pillar position.
-3. Move to the right side of the pillar.
-4. Pass the pillar safely.
-5. Return to normal lane following.
+When an obstacle is detected, the software performs the following sequence:
 
-## Green Pillar Strategy
+1. Confirm the obstacle using the ToF sensor readings.
+2. Reduce vehicle speed if necessary.
+3. Calculate a safe steering correction.
+4. Drive around the obstacle.
+5. Return smoothly to the driving lane.
+6. Resume normal lane following.
 
-When a green pillar is detected:
+---
 
-1. Confirm detection.
-2. Estimate pillar position.
-3. Move to the left side of the pillar.
-4. Pass the pillar safely.
-5. Return to normal lane following.
+# Safety Considerations
 
-## Safety Conditions
+During obstacle avoidance, the software aims to:
 
-The robot should:
+- Maintain a safe distance from the obstacle.
+- Prevent sudden steering movements.
+- Keep the vehicle stable throughout the maneuver.
+- Return smoothly to the original driving path.
 
-- Avoid touching the pillar.
-- Avoid moving the pillar outside its allowed area.
-- Maintain stable steering while passing.
-- Return smoothly to the driving path.
+---
 
-## State Machine Integration
+# State Machine Integration
 
-Obstacle avoidance is connected to the software state machine.
+Obstacle avoidance is integrated with the robot state machine.
 
-FOLLOW_TRACK
-    ↓
-DETECT_PILLAR
-    ↓
-RED or GREEN
-    ↓
-AVOID_PILLAR
-    ↓
-FOLLOW_TRACK
+```text
+WAIT_FOR_START
+        ↓
+LANE_FOLLOWING
+        ↓
+OBSTACLE_DETECTED
+        ↓
+OBSTACLE_AVOIDANCE
+        ↓
+LANE_FOLLOWING
+```
 
-## Testing Plan
+---
 
-The obstacle avoidance algorithm will be tested using:
+# Testing
 
-- Different pillar positions.
-- Different lighting conditions.
-- Different robot speeds.
+The obstacle avoidance algorithm is evaluated under different conditions, including:
 
-Results will be documented and used to improve reliability.
+- Different obstacle positions.
+- Various approach distances.
+- Multiple driving speeds.
 
-## Current Status
-
-The obstacle avoidance strategy is currently in the design phase.
-
-The final implementation will be developed after hardware selection and camera integration.
+The collected test results are used to improve the reliability and consistency of the avoidance behavior.
