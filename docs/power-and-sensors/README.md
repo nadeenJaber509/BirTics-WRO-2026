@@ -70,4 +70,12 @@ This incremental approach reduces debugging time, simplifies fault isolation, an
 
 The complete electrical wiring map of the current robot prototype is provided below.
 
-📄 [Robot Wiring Map](robot-wiring-map.pdf)
+📄 [Robot Wiring Map](WRO_Robot_Wiring.pdf)
+
+## Complete Robot Wiring
+
+<p align="center">
+  <img src="../../assets/diagrams/robot-wiring-map.png" width="900">
+</p>
+
+A complete overview of the current electrical connections, GPIO assignments, power distribution, and sensor wiring.
