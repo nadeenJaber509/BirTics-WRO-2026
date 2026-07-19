@@ -25,6 +25,17 @@ Every test aims to answer one or more of the following questions:
 This methodology reduces debugging time and allows engineering decisions to be based on experimental observations rather than assumptions.
 
 ---
+# Testing Roadmap
+
+The overall validation strategy adopted during the development of the BirTics WRO 2026 robot is summarized below.
+
+The roadmap illustrates the progressive transition from individual hardware verification to subsystem integration, algorithm validation, and complete autonomous robot testing.
+
+<p align="center">
+  <img src="../../assets/testing/testing-plan-summary.png" width="950">
+</p>
+
+The roadmap serves as a high-level reference throughout the project and helps ensure that each subsystem is validated before being integrated into the complete autonomous robot.
 
 # Current Test Documentation
 
