@@ -759,7 +759,7 @@ The diagram summarizes:
 This reference helps maintain wiring consistency during future hardware modifications and reduces the risk of connection errors during subsystem integration.
 
 <p align="center">
-  <img src="../assets/diagrams/robot-wiring-map.png" width="900">
+  <img src="../assets/diagrams/Robot Wiring Map.jpg" width="900">
 </p>
 
 ---
@@ -782,7 +782,7 @@ The roadmap serves as a common engineering reference throughout the project and 
 > The testing roadmap represents the planned validation strategy for the project. Each stage will be updated as development and integration continue.
 
 <p align="center">
-  <img src="../assets/testing/testing-plan-summary.png" width="950">
+  <img src="../assets/testing/testing-plan-overview.jpg" width="950">
 </p>
 
 ---
