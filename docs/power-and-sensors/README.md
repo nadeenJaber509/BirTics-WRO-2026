@@ -65,3 +65,9 @@ The robot uses three VL6180X Time-of-Flight sensors to estimate distances to the
 Each electronic subsystem is tested independently before being integrated into the complete robot.
 
 This incremental approach reduces debugging time, simplifies fault isolation, and provides clear documentation of engineering decisions throughout the development process.
+
+## Complete Wiring Diagram
+
+The complete electrical wiring map of the current robot prototype is provided below.
+
+📄 [Robot Wiring Map](robot-wiring-map.pdf)
