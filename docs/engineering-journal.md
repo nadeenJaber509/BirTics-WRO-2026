@@ -731,6 +731,69 @@ Every prototype, design revision, and technical discussion helped us reduce unce
 Looking back, the most valuable outcome has not only been the robot itself, but also the engineering experience gained while developing it.
 
 ---
+
+# 17 July 2026 — Engineering Reference Documentation
+
+As the hardware integration progressed, the team prepared two engineering reference documents to support the remaining stages of robot development.
+
+Instead of relying on scattered notes and individual test files, the robot's electrical architecture and validation strategy were consolidated into visual engineering references that can be easily consulted throughout the project.
+
+These documents improve consistency during development, simplify troubleshooting, and provide a common technical reference for all team members.
+
+---
+
+## Robot Wiring Map
+
+A complete wiring map was created to document the current electrical architecture of the robot.
+
+The diagram summarizes:
+
+- ESP32 GPIO assignments
+- Power distribution
+- L298N motor driver connections
+- Steering servo interface
+- Three VL6180X ToF sensors
+- Two TCS3200 color sensors
+- I²C expansion board connections
+
+This reference helps maintain wiring consistency during future hardware modifications and reduces the risk of connection errors during subsystem integration.
+
+<p align="center">
+  <img src="../assets/diagrams/robot-wiring-map.png" width="900">
+</p>
+
+---
+
+## Testing Plan Overview
+
+To organize the validation process, a high-level testing roadmap was prepared.
+
+Rather than validating the complete autonomous robot immediately, the development process was divided into progressive engineering stages:
+
+- Individual hardware validation
+- Hardware integration
+- Algorithm validation
+- Complete autonomous robot evaluation
+
+The roadmap serves as a common engineering reference throughout the project and ensures that each subsystem is validated before moving to the next integration stage.
+
+> **Engineering Note**
+>
+> The testing roadmap represents the planned validation strategy for the project. Each stage will be updated as development and integration continue.
+
+<p align="center">
+  <img src="../assets/testing/testing-plan-summary.png" width="950">
+</p>
+
+---
+
+## Engineering Reflection
+
+Preparing these engineering reference documents improved the organization of the project by creating a centralized source of information for both hardware connections and system validation.
+
+Although these documents do not directly modify the robot hardware or software, they significantly improve future development, debugging, and collaboration by reducing ambiguity during hardware integration and testing.
+
+
 # 🚀 Looking Ahead
 
 The engineering journey of Team BirTics is still ongoing.
