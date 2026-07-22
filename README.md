@@ -133,8 +133,6 @@ For a complete explanation of the software architecture, refer to the **[Softwar
 
 <p align="center">
         <img src="assets/diagrams/team.png">
-        < alt="BirTics Team"
-       width="900">
 </p>
 
 <p align="center">
