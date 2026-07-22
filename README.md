@@ -25,19 +25,6 @@
 
 </div>
 
-## 👥 Meet the Team
-
-
-<p align="center">
-  <img src="assets/diagrams/team.png"
-       alt="BirTics Team"
-       width="900">
-</p>
-
-<p align="center">
-  <a href="docs/team-roles.md">📄 View Team Roles →</a>
-</p>
-
 # 📖 Executive Summary
 
 BirTics is a three-member engineering team participating in the **WRO Future Engineers 2026** competition.
@@ -107,16 +94,31 @@ BirTics is a four-wheel autonomous vehicle designed for the **WRO Future Enginee
 The robot has been designed around a modular philosophy. Each subsystem—including sensing, motion control, steering, and perception—is validated individually before being integrated into the complete autonomous platform. This workflow simplifies debugging, improves maintainability, and enables continuous refinement throughout development.
 
 ---
+# 🖥️ Hardware Architecture
 
-# 🏗️ System Architecture
-
-The robot is organized into independent hardware and software modules that communicate through the ESP32 controller.
+The BirTics robot is built around an ESP32-based modular hardware architecture. Each subsystem is connected to the ESP32 through dedicated communication interfaces, allowing the robot to process sensor data and control the actuators in real time.
 
 <p align="center">
-<img src="assets/diagrams/system-architecture.png" width="900">
+<img src="assets/daigrams/hardware-architecture.png" width="950">
 </p>
 
-The architecture consists of four primary layers:
+The hardware consists of:
+
+- ESP32 DevKit V1 as the main controller
+- ESP32 Expansion Shield for sensor integration
+- 3 × VL6180X Time-of-Flight sensors
+- 2 × TCS3200 color sensors
+- MPU6050 IMU
+- L298N motor driver
+- Ackermann steering servo
+- Rear DC drive motor
+- 9V battery power system
+
+For detailed wiring and GPIO assignments, see the **[Power & Sensors](docs/power-and-sensors/README.md)** documentation.
+
+# 💻 Software Architecture
+
+The robot software is organized into independent functional layers. Each layer performs a specific task, allowing the system to remain modular, maintainable, and easy to debug.
 
 | Layer | Responsibility |
 |--------|----------------|
@@ -125,5 +127,42 @@ The architecture consists of four primary layers:
 | **Control** | Compute steering angles and motor speed using embedded control algorithms. |
 | **Actuation** | Drive the steering servo and rear-wheel motor to execute movement. |
 
-For a complete explanation of the architecture, refer to the **[Software Architecture](docs/software-architecture/README.md)** documentation.
+For a complete explanation of the software architecture, refer to the **[Software Architecture](docs/software-architecture/README.md)** documentation.
 
+# 👥 Team BirTics
+
+<p align="center">
+  <img src="assets/diagrams/hardware-architecture.png">
+  alt="BirTics Team"
+       width="900">
+</p>
+
+<p align="center">
+  <a href="docs/team-roles.md">📄 View Team Roles →</a>
+</p>
+
+---
+
+# 📂 Repository Structure
+
+The repository is organized around the engineering workflow used throughout the project.
+
+| Folder | Description |
+|---------|-------------|
+| 📁 assets | Images, diagrams, renders, and project media |
+| 📁 code | ESP32 firmware and software prototypes |
+| 📁 docs | Engineering documentation and project records |
+
+Each folder is designed to provide judges with a clear understanding of the project's design process, implementation, and validation.
+
+---
+
+<div align="center">
+
+### BirTics • WRO Future Engineers 2026
+
+Designed, Built, and Documented by Students from **Birzeit University**
+
+⭐ Engineering through Design • Testing • Continuous Improvement ⭐
+
+</div>
