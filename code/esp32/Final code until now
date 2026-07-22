@@ -1,0 +1,2106 @@
+/*
+  ============================================================
+  BIRTICS - WRO FUTURE ENGINEERS 2026
+  FULL COMPETITION BASELINE CODE
+  ============================================================
+
+  Hardware:
+  - ESP32 DevKit
+  - L298N Channel B
+  - Rear DC motor
+  - Front steering servo
+  - 3 x VL6180X ToF sensors
+  - 2 x TCS3200 color sensors
+  - MPU6050 gyroscope/accelerometer on the shared I2C expansion board
+
+  Confirmed GPIO:
+  L298N ENB  -> GPIO26
+  L298N IN3  -> GPIO14
+  L298N IN4  -> GPIO27
+
+  Servo      -> GPIO18
+
+  I2C SDA    -> GPIO21
+  I2C SCL    -> GPIO22
+
+  Front XSHUT -> GPIO25
+  Left XSHUT  -> GPIO32
+  Right XSHUT -> GPIO33
+
+  TCS3200 shared:
+  S0 -> GPIO4
+  S1 -> GPIO16
+  S2 -> GPIO17
+  S3 -> GPIO5
+
+  Ground color OUT -> GPIO34
+  Front color OUT  -> GPIO35
+
+  Start button:
+  ESP32 BOOT button -> GPIO0
+
+  Required libraries:
+  - Adafruit VL6180X
+  - ESP32Servo
+  - MPU6050_light
+
+
+  ELECTRICAL SAFETY:
+  - MPU6050 and VL6180X modules: use 3.3V unless your exact breakout
+    board explicitly includes a regulator/level shifting.
+  - ESP32 GPIO34 and GPIO35 are input-only and are NOT 5V tolerant.
+  - If a TCS3200 is powered from 5V, use a level shifter or divider on OUT.
+    Safer direct ESP32 setup: power the TCS3200 logic from 3.3V.
+  - The battery switch is wired in series with battery positive; it has
+    no software pin and therefore requires no code.
+  - Servo power problems must be fixed electrically. Code cannot protect
+    a servo that is being driven into a mechanical stop by unstable power.
+
+  IMPORTANT:
+  1. Press BOOT only after ESP32 has finished booting.
+  2. Do not hold BOOT while switching the ESP32 on.
+  3. Calibrate servo, colors, distances and timing on the real field.
+  ============================================================
+*/
+
+#include <Wire.h>
+#include <Adafruit_VL6180X.h>
+#include <ESP32Servo.h>
+#include <MPU6050_light.h>
+
+// ============================================================
+// CHALLENGE SELECTION
+// ============================================================
+
+enum ChallengeMode {
+  OPEN_CHALLENGE,
+  OBSTACLE_CHALLENGE
+};
+
+// Change only this line before vehicle check:
+const ChallengeMode CHALLENGE_MODE = OBSTACLE_CHALLENGE;
+
+// ============================================================
+// ROBOT STATES
+// ============================================================
+
+enum RobotState {
+  STATE_WAITING_START,
+  STATE_NORMAL_DRIVING,
+  STATE_CORNER_TURN,
+  STATE_AVOID_RED,
+  STATE_AVOID_GREEN,
+  STATE_RECOVER_FROM_OBSTACLE,
+  STATE_SEARCH_PARKING,
+  STATE_PARKING_STEP_1,
+  STATE_PARKING_STEP_2,
+  STATE_PARKING_STEP_3,
+  STATE_PARKING_STEP_4,
+  STATE_FINISH_OFFSET,
+  STATE_FINISHED,
+  STATE_EMERGENCY_STOP
+};
+
+RobotState robotState = STATE_WAITING_START;
+
+// ============================================================
+// PIN DEFINITIONS
+// ============================================================
+
+// I2C
+#define SDA_PIN 21
+#define SCL_PIN 22
+
+// ToF XSHUT
+#define FRONT_XSHUT 25
+#define LEFT_XSHUT  32
+#define RIGHT_XSHUT 33
+
+// ToF addresses
+#define FRONT_ADDRESS 0x30
+#define LEFT_ADDRESS  0x31
+#define RIGHT_ADDRESS 0x32
+
+// Motor - L298N Channel B
+#define MOTOR_ENB 26
+#define MOTOR_IN3 14
+#define MOTOR_IN4 27
+
+// Servo
+#define SERVO_PIN 18
+
+// Color sensors
+#define COLOR_S0 4
+#define COLOR_S1 16
+#define COLOR_S2 17
+#define COLOR_S3 5
+
+#define GROUND_COLOR_OUT 34
+#define FRONT_COLOR_OUT  35
+
+// ESP32 BOOT button
+#define START_BUTTON_PIN 0
+
+// ============================================================
+// OBJECTS
+// ============================================================
+
+Adafruit_VL6180X frontToF;
+Adafruit_VL6180X leftToF;
+Adafruit_VL6180X rightToF;
+
+Servo steeringServo;
+MPU6050 mpu(Wire);
+
+// ============================================================
+// SERVO CALIBRATION
+// ============================================================
+
+/*
+  Based on the latest code:
+  110 = LEFT
+  120 = CENTER
+  130 = RIGHT
+
+  Recheck mechanically before driving.
+*/
+
+const int SERVO_FULL_LEFT  = 110;
+const int SERVO_CENTER     = 120;
+const int SERVO_FULL_RIGHT = 130;
+
+// Less aggressive steering positions
+const int SERVO_SOFT_LEFT  = 114;
+const int SERVO_SOFT_RIGHT = 126;
+
+int currentServoAngle = SERVO_CENTER;
+int targetServoAngle  = SERVO_CENTER;
+
+// ============================================================
+// MPU6050 / GYROSCOPE SETTINGS
+// ============================================================
+
+/*
+  MPU6050 wiring through the I2C expansion board:
+  VCC -> 3.3V
+  GND -> common GND
+  SDA -> GPIO21
+  SCL -> GPIO22
+
+  The MPU6050 uses its normal I2C address 0x68.
+  The three VL6180X sensors are moved to 0x30, 0x31 and 0x32,
+  so there is no I2C address conflict.
+
+  Keep the vehicle completely still during startup calibration.
+*/
+
+bool imuReady = false;
+float currentYawDeg = 0.0;
+float roundHeadingDeg = 0.0;
+float cornerStartYawDeg = 0.0;
+float obstacleStartYawDeg = 0.0;
+
+unsigned long previousImuTime = 0;
+const unsigned long IMU_UPDATE_INTERVAL_MS = 5;
+
+// A car normally starts leaving the corner before a full 90 degrees.
+// Tune this between about 72 and 88 degrees on the real field.
+const float CORNER_EXIT_ANGLE_DEG = 80.0;
+
+// Gyroscope safety fallback. The existing distance/time conditions
+// remain active if the IMU is missing or a turn does not reach the angle.
+const bool USE_IMU_FOR_CORNER_EXIT = true;
+
+float absoluteYawChange(float startAngle, float currentAngle) {
+  return fabs(currentAngle - startAngle);
+}
+
+void updateIMU() {
+  if (!imuReady) {
+    return;
+  }
+
+  unsigned long now = millis();
+
+  if (now - previousImuTime < IMU_UPDATE_INTERVAL_MS) {
+    return;
+  }
+
+  previousImuTime = now;
+  mpu.update();
+  currentYawDeg = mpu.getAngleZ();
+}
+
+bool initializeMPU6050() {
+  Serial.println("Initializing MPU6050 at I2C address 0x68...");
+
+  byte status = mpu.begin();
+
+  if (status != 0) {
+    Serial.print("WARNING: MPU6050 initialization failed, status=");
+    Serial.println(status);
+    Serial.println("Robot will continue using ToF/time fallbacks.");
+    imuReady = false;
+    return false;
+  }
+
+  Serial.println("Keep the robot completely still: calibrating MPU6050...");
+  delay(500);
+
+  // Calculates gyro and accelerometer offsets.
+  mpu.calcOffsets(true, true);
+
+  mpu.update();
+  currentYawDeg = mpu.getAngleZ();
+  roundHeadingDeg = currentYawDeg;
+  imuReady = true;
+
+  Serial.println("MPU6050 ready.");
+  return true;
+}
+
+
+// ============================================================
+// MOTOR SETTINGS
+// ============================================================
+
+const int PWM_FREQUENCY  = 1000;
+const int PWM_RESOLUTION = 8;
+
+const int MOTOR_NORMAL_SPEED   = 110;
+const int MOTOR_SLOW_SPEED     = 88;
+const int MOTOR_CORNER_SPEED   = 82;
+const int MOTOR_OBSTACLE_SPEED = 78;
+const int MOTOR_PARKING_SPEED  = 72;
+
+// Set true if forward/backward directions are reversed.
+const bool REVERSE_MOTOR_DIRECTION = false;
+
+// ============================================================
+// DISTANCE SETTINGS — MILLIMETERS
+// ============================================================
+
+const int FRONT_EMERGENCY_DISTANCE = 45;
+const int FRONT_STOP_DISTANCE      = 58;
+const int FRONT_SLOW_DISTANCE      = 110;
+
+// Front distance at which a colored pillar is considered close.
+const int OBSTACLE_TRIGGER_DISTANCE = 150;
+
+// Corner detection
+const int CORNER_FRONT_DISTANCE = 88;
+const int CORNER_SIDE_OPEN      = 125;
+
+// Normal side target distance
+const int SIDE_TARGET_DISTANCE = 82;
+
+// Parking opening
+const int PARKING_OPEN_DISTANCE = 155;
+const int PARKING_CLOSE_DISTANCE = 95;
+
+// VL6180X reliable practical range
+const int MAX_VALID_TOF_DISTANCE = 240;
+
+// ============================================================
+// PID SETTINGS
+// ============================================================
+
+float KP = 0.105;
+float KI = 0.000;
+float KD = 0.055;
+
+float pidIntegral     = 0.0;
+float previousPidError = 0.0;
+
+const float PID_INTEGRAL_LIMIT = 80.0;
+const int PID_MAX_CORRECTION   = 10;
+const int SIDE_DEADBAND        = 5;
+
+// ============================================================
+// FILTERING
+// ============================================================
+
+const float DISTANCE_FILTER_ALPHA = 0.35;
+
+float filteredFront = 0;
+float filteredLeft  = 0;
+float filteredRight = 0;
+
+bool distanceFilterInitialized = false;
+
+// ============================================================
+// SENSOR DATA
+// ============================================================
+
+struct DistanceData {
+  int front;
+  int left;
+  int right;
+
+  bool frontValid;
+  bool leftValid;
+  bool rightValid;
+};
+
+DistanceData distanceData;
+
+// ============================================================
+// COLOR SENSOR DATA
+// ============================================================
+
+struct RGBReading {
+  unsigned long red;
+  unsigned long green;
+  unsigned long blue;
+  unsigned long clearValue;
+  bool valid;
+};
+
+RGBReading groundRGB;
+RGBReading frontRGB;
+
+enum DetectedColor {
+  COLOR_UNKNOWN,
+  COLOR_RED,
+  COLOR_GREEN,
+  COLOR_BLUE,
+  COLOR_ORANGE,
+  COLOR_WHITE,
+  COLOR_BLACK
+};
+
+DetectedColor frontDetectedColor  = COLOR_UNKNOWN;
+DetectedColor groundDetectedColor = COLOR_UNKNOWN;
+
+// ============================================================
+// COLOR CALIBRATION
+// ============================================================
+
+/*
+  TCS3200 returns pulse duration.
+  A LOWER pulse value normally means stronger detected color.
+
+  These ratio values are starting points.
+  Adjust after printing the actual R/G/B readings.
+*/
+
+// Front pillar ratios
+const float RED_DOMINANCE_RATIO       = 0.78;
+const float GREEN_DOMINANCE_RATIO     = 0.82;
+
+// Ground line ratios
+const float BLUE_DOMINANCE_RATIO      = 0.80;
+const float ORANGE_RED_RATIO          = 0.82;
+const float ORANGE_BLUE_WEAK_RATIO    = 0.72;
+
+// Pulse limits
+const unsigned long COLOR_MIN_PULSE = 20;
+const unsigned long COLOR_MAX_PULSE = 30000;
+const unsigned long COLOR_TIMEOUT_US = 35000;
+
+// ============================================================
+// LAP AND SECTION COUNTING
+// ============================================================
+
+/*
+  The field contains four corners and four straight sections.
+
+  The ground sensor detects colored section boundary lines.
+  Four accepted boundary events are treated as one lap.
+
+  The first time from Start to the first boundary is stored.
+  After 12 boundary events, Open Challenge drives approximately
+  the same offset to return near the original start position.
+*/
+
+const int SECTION_EVENTS_PER_LAP = 4;
+const int REQUIRED_LAPS          = 3;
+const int REQUIRED_SECTION_EVENTS =
+  SECTION_EVENTS_PER_LAP * REQUIRED_LAPS;
+
+int sectionEventCount = 0;
+int completedLaps     = 0;
+
+bool groundLineActive = false;
+
+unsigned long lastGroundLineTime = 0;
+const unsigned long GROUND_LINE_DEBOUNCE_MS = 900;
+
+unsigned long robotStartTime = 0;
+unsigned long firstBoundaryOffsetMs = 0;
+bool firstBoundaryRecorded = false;
+
+unsigned long finishOffsetStartTime = 0;
+
+// Prevent unrealistic finish offset.
+const unsigned long MIN_FINISH_OFFSET_MS = 300;
+const unsigned long MAX_FINISH_OFFSET_MS = 6000;
+
+// ============================================================
+// TIMING
+// ============================================================
+
+unsigned long stateStartTime = 0;
+unsigned long previousSensorTime = 0;
+unsigned long previousServoTime  = 0;
+unsigned long previousPrintTime  = 0;
+unsigned long previousColorTime  = 0;
+
+const unsigned long SENSOR_INTERVAL_MS = 35;
+const unsigned long SERVO_INTERVAL_MS  = 25;
+const unsigned long PRINT_INTERVAL_MS  = 250;
+const unsigned long COLOR_INTERVAL_MS  = 65;
+
+// Maximum official challenge duration
+const unsigned long ROUND_TIMEOUT_MS = 180000;
+
+// ============================================================
+// OBSTACLE MANEUVER TIMING
+// ============================================================
+
+/*
+  Tune these on the real robot.
+  Red pillar:
+  pass on its right -> steer right first.
+
+  Green pillar:
+  pass on its left -> steer left first.
+*/
+
+const unsigned long OBSTACLE_FIRST_STEER_MS  = 520;
+const unsigned long OBSTACLE_RECOVER_MS      = 520;
+const unsigned long OBSTACLE_COOLDOWN_MS     = 900;
+
+unsigned long lastObstacleTime = 0;
+
+DetectedColor activeObstacleColor = COLOR_UNKNOWN;
+
+// ============================================================
+// CORNER TIMING
+// ============================================================
+
+const unsigned long CORNER_MIN_TIME_MS = 420;
+const unsigned long CORNER_MAX_TIME_MS = 1300;
+
+bool cornerTurningLeft = false;
+
+// ============================================================
+// PARKING SETTINGS
+// ============================================================
+
+enum ParkingSide {
+  PARKING_NONE,
+  PARKING_LEFT,
+  PARKING_RIGHT
+};
+
+ParkingSide parkingSide = PARKING_NONE;
+
+unsigned long parkingOpeningStartTime = 0;
+bool parkingOpeningDetected = false;
+
+// The opening must remain visible for this long.
+const unsigned long PARKING_OPEN_CONFIRM_MS = 300;
+
+// Parallel parking timing
+const unsigned long PARK_STEP_1_TIME_MS = 420;
+const unsigned long PARK_STEP_2_TIME_MS = 760;
+const unsigned long PARK_STEP_3_TIME_MS = 650;
+const unsigned long PARK_STEP_4_TIME_MS = 450;
+
+// ============================================================
+// ERROR HANDLING
+// ============================================================
+
+int frontSensorErrors = 0;
+int leftSensorErrors  = 0;
+int rightSensorErrors = 0;
+
+const int MAX_CONSECUTIVE_SENSOR_ERRORS = 8;
+
+int closeFrontCounter = 0;
+const int REQUIRED_CLOSE_READINGS = 3;
+
+// ============================================================
+// HELPER FUNCTIONS
+// ============================================================
+
+void changeState(RobotState newState) {
+  robotState = newState;
+  stateStartTime = millis();
+
+  Serial.print("STATE -> ");
+
+  switch (newState) {
+    case STATE_WAITING_START:
+      Serial.println("WAITING_START");
+      break;
+
+    case STATE_NORMAL_DRIVING:
+      Serial.println("NORMAL_DRIVING");
+      break;
+
+    case STATE_CORNER_TURN:
+      Serial.println("CORNER_TURN");
+      break;
+
+    case STATE_AVOID_RED:
+      Serial.println("AVOID_RED");
+      break;
+
+    case STATE_AVOID_GREEN:
+      Serial.println("AVOID_GREEN");
+      break;
+
+    case STATE_RECOVER_FROM_OBSTACLE:
+      Serial.println("RECOVER_FROM_OBSTACLE");
+      break;
+
+    case STATE_SEARCH_PARKING:
+      Serial.println("SEARCH_PARKING");
+      break;
+
+    case STATE_PARKING_STEP_1:
+      Serial.println("PARKING_STEP_1");
+      break;
+
+    case STATE_PARKING_STEP_2:
+      Serial.println("PARKING_STEP_2");
+      break;
+
+    case STATE_PARKING_STEP_3:
+      Serial.println("PARKING_STEP_3");
+      break;
+
+    case STATE_PARKING_STEP_4:
+      Serial.println("PARKING_STEP_4");
+      break;
+
+    case STATE_FINISH_OFFSET:
+      Serial.println("FINISH_OFFSET");
+      break;
+
+    case STATE_FINISHED:
+      Serial.println("FINISHED");
+      break;
+
+    case STATE_EMERGENCY_STOP:
+      Serial.println("EMERGENCY_STOP");
+      break;
+  }
+}
+
+unsigned long stateElapsed() {
+  return millis() - stateStartTime;
+}
+
+// ============================================================
+// MOTOR FUNCTIONS
+// ============================================================
+
+void stopMotor() {
+  ledcWrite(MOTOR_ENB, 0);
+
+  digitalWrite(MOTOR_IN3, LOW);
+  digitalWrite(MOTOR_IN4, LOW);
+}
+
+void driveMotorRaw(bool forward, int speedValue) {
+  speedValue = constrain(speedValue, 0, 255);
+
+  bool actualForward = forward;
+
+  if (REVERSE_MOTOR_DIRECTION) {
+    actualForward = !actualForward;
+  }
+
+  if (actualForward) {
+    digitalWrite(MOTOR_IN3, HIGH);
+    digitalWrite(MOTOR_IN4, LOW);
+  } else {
+    digitalWrite(MOTOR_IN3, LOW);
+    digitalWrite(MOTOR_IN4, HIGH);
+  }
+
+  ledcWrite(MOTOR_ENB, speedValue);
+}
+
+void moveForward(int speedValue) {
+  driveMotorRaw(true, speedValue);
+}
+
+void moveBackward(int speedValue) {
+  driveMotorRaw(false, speedValue);
+}
+
+// ============================================================
+// SERVO FUNCTIONS
+// ============================================================
+
+void setSteeringTarget(int angle) {
+  targetServoAngle = constrain(
+    angle,
+    SERVO_FULL_LEFT,
+    SERVO_FULL_RIGHT
+  );
+}
+
+void centerSteering() {
+  setSteeringTarget(SERVO_CENTER);
+}
+
+void steerFullLeft() {
+  setSteeringTarget(SERVO_FULL_LEFT);
+}
+
+void steerFullRight() {
+  setSteeringTarget(SERVO_FULL_RIGHT);
+}
+
+void steerSoftLeft() {
+  setSteeringTarget(SERVO_SOFT_LEFT);
+}
+
+void steerSoftRight() {
+  setSteeringTarget(SERVO_SOFT_RIGHT);
+}
+
+void updateServoSmoothly() {
+  unsigned long now = millis();
+
+  if (now - previousServoTime < SERVO_INTERVAL_MS) {
+    return;
+  }
+
+  previousServoTime = now;
+
+  if (currentServoAngle < targetServoAngle) {
+    currentServoAngle++;
+  } else if (currentServoAngle > targetServoAngle) {
+    currentServoAngle--;
+  }
+
+  currentServoAngle = constrain(
+    currentServoAngle,
+    SERVO_FULL_LEFT,
+    SERVO_FULL_RIGHT
+  );
+
+  steeringServo.write(currentServoAngle);
+}
+
+// ============================================================
+// ToF INITIALIZATION
+// ============================================================
+
+bool startToFSensor(
+  Adafruit_VL6180X &sensor,
+  int xshutPin,
+  uint8_t newAddress,
+  const char *sensorName
+) {
+  digitalWrite(xshutPin, HIGH);
+  delay(150);
+
+  if (!sensor.begin()) {
+    Serial.print(sensorName);
+    Serial.println(" ToF not found.");
+    return false;
+  }
+
+  sensor.setAddress(newAddress);
+  delay(50);
+
+  Serial.print(sensorName);
+  Serial.print(" ToF ready at 0x");
+  Serial.println(newAddress, HEX);
+
+  return true;
+}
+
+bool initializeToFSensors() {
+  pinMode(FRONT_XSHUT, OUTPUT);
+  pinMode(LEFT_XSHUT, OUTPUT);
+  pinMode(RIGHT_XSHUT, OUTPUT);
+
+  digitalWrite(FRONT_XSHUT, LOW);
+  digitalWrite(LEFT_XSHUT, LOW);
+  digitalWrite(RIGHT_XSHUT, LOW);
+
+  delay(250);
+
+  if (!startToFSensor(
+        frontToF,
+        FRONT_XSHUT,
+        FRONT_ADDRESS,
+        "FRONT"
+      )) {
+    return false;
+  }
+
+  if (!startToFSensor(
+        leftToF,
+        LEFT_XSHUT,
+        LEFT_ADDRESS,
+        "LEFT"
+      )) {
+    return false;
+  }
+
+  if (!startToFSensor(
+        rightToF,
+        RIGHT_XSHUT,
+        RIGHT_ADDRESS,
+        "RIGHT"
+      )) {
+    return false;
+  }
+
+  return true;
+}
+
+// ============================================================
+// ToF READING
+// ============================================================
+
+bool readOneToF(
+  Adafruit_VL6180X &sensor,
+  int &distance
+) {
+  uint8_t reading = sensor.readRange();
+  uint8_t status  = sensor.readRangeStatus();
+
+  if (status != VL6180X_ERROR_NONE) {
+    return false;
+  }
+
+  if (reading <= 0 || reading > MAX_VALID_TOF_DISTANCE) {
+    return false;
+  }
+
+  distance = reading;
+  return true;
+}
+
+void readDistanceSensors() {
+  unsigned long now = millis();
+
+  if (now - previousSensorTime < SENSOR_INTERVAL_MS) {
+    return;
+  }
+
+  previousSensorTime = now;
+
+  distanceData.frontValid =
+    readOneToF(frontToF, distanceData.front);
+
+  distanceData.leftValid =
+    readOneToF(leftToF, distanceData.left);
+
+  distanceData.rightValid =
+    readOneToF(rightToF, distanceData.right);
+
+  if (distanceData.frontValid) {
+    frontSensorErrors = 0;
+  } else {
+    frontSensorErrors++;
+  }
+
+  if (distanceData.leftValid) {
+    leftSensorErrors = 0;
+  } else {
+    leftSensorErrors++;
+  }
+
+  if (distanceData.rightValid) {
+    rightSensorErrors = 0;
+  } else {
+    rightSensorErrors++;
+  }
+}
+
+void updateDistanceFilters() {
+  if (!distanceFilterInitialized) {
+    if (
+      distanceData.frontValid &&
+      distanceData.leftValid &&
+      distanceData.rightValid
+    ) {
+      filteredFront = distanceData.front;
+      filteredLeft  = distanceData.left;
+      filteredRight = distanceData.right;
+
+      distanceFilterInitialized = true;
+    }
+
+    return;
+  }
+
+  if (distanceData.frontValid) {
+    filteredFront =
+      DISTANCE_FILTER_ALPHA * distanceData.front +
+      (1.0 - DISTANCE_FILTER_ALPHA) * filteredFront;
+  }
+
+  if (distanceData.leftValid) {
+    filteredLeft =
+      DISTANCE_FILTER_ALPHA * distanceData.left +
+      (1.0 - DISTANCE_FILTER_ALPHA) * filteredLeft;
+  }
+
+  if (distanceData.rightValid) {
+    filteredRight =
+      DISTANCE_FILTER_ALPHA * distanceData.right +
+      (1.0 - DISTANCE_FILTER_ALPHA) * filteredRight;
+  }
+}
+
+// ============================================================
+// TCS3200 COLOR READING
+// ============================================================
+
+unsigned long readColorPulse(
+  int outputPin,
+  bool s2Value,
+  bool s3Value
+) {
+  digitalWrite(COLOR_S2, s2Value);
+  digitalWrite(COLOR_S3, s3Value);
+
+  delayMicroseconds(250);
+
+  unsigned long pulse =
+    pulseIn(outputPin, LOW, COLOR_TIMEOUT_US);
+
+  return pulse;
+}
+
+bool validColorPulse(unsigned long pulse) {
+  return (
+    pulse >= COLOR_MIN_PULSE &&
+    pulse <= COLOR_MAX_PULSE
+  );
+}
+
+RGBReading readRGBSensor(int outputPin) {
+  RGBReading reading;
+
+  // TCS3200 filters:
+  // Red  : S2 LOW,  S3 LOW
+  // Blue : S2 LOW,  S3 HIGH
+  // Clear: S2 HIGH, S3 LOW
+  // Green: S2 HIGH, S3 HIGH
+
+  reading.red =
+    readColorPulse(outputPin, LOW, LOW);
+
+  reading.blue =
+    readColorPulse(outputPin, LOW, HIGH);
+
+  reading.clearValue =
+    readColorPulse(outputPin, HIGH, LOW);
+
+  reading.green =
+    readColorPulse(outputPin, HIGH, HIGH);
+
+  reading.valid =
+    validColorPulse(reading.red) &&
+    validColorPulse(reading.green) &&
+    validColorPulse(reading.blue);
+
+  return reading;
+}
+
+DetectedColor classifyFrontColor(const RGBReading &rgb) {
+  if (!rgb.valid) {
+    return COLOR_UNKNOWN;
+  }
+
+  float r = rgb.red;
+  float g = rgb.green;
+  float b = rgb.blue;
+
+  // Lower pulse means stronger color.
+  bool redStrong =
+    r < g * RED_DOMINANCE_RATIO &&
+    r < b * RED_DOMINANCE_RATIO;
+
+  bool greenStrong =
+    g < r * GREEN_DOMINANCE_RATIO &&
+    g < b * GREEN_DOMINANCE_RATIO;
+
+  if (redStrong) {
+    return COLOR_RED;
+  }
+
+  if (greenStrong) {
+    return COLOR_GREEN;
+  }
+
+  return COLOR_UNKNOWN;
+}
+
+DetectedColor classifyGroundColor(const RGBReading &rgb) {
+  if (!rgb.valid) {
+    return COLOR_UNKNOWN;
+  }
+
+  float r = rgb.red;
+  float g = rgb.green;
+  float b = rgb.blue;
+
+  bool blueStrong =
+    b < r * BLUE_DOMINANCE_RATIO &&
+    b < g * BLUE_DOMINANCE_RATIO;
+
+  bool orangeStrong =
+    r < g * ORANGE_RED_RATIO &&
+    b > r / ORANGE_BLUE_WEAK_RATIO;
+
+  if (blueStrong) {
+    return COLOR_BLUE;
+  }
+
+  if (orangeStrong) {
+    return COLOR_ORANGE;
+  }
+
+  return COLOR_UNKNOWN;
+}
+
+void updateColorSensors() {
+  unsigned long now = millis();
+
+  if (now - previousColorTime < COLOR_INTERVAL_MS) {
+    return;
+  }
+
+  previousColorTime = now;
+
+  /*
+    Because S2/S3 are shared, sensors are read sequentially.
+    This is intentional.
+  */
+
+  frontRGB = readRGBSensor(FRONT_COLOR_OUT);
+  frontDetectedColor = classifyFrontColor(frontRGB);
+
+  groundRGB = readRGBSensor(GROUND_COLOR_OUT);
+  groundDetectedColor = classifyGroundColor(groundRGB);
+}
+
+// ============================================================
+// START BUTTON
+// ============================================================
+
+bool startButtonPressed() {
+  static bool previousReading = HIGH;
+  static unsigned long debounceStart = 0;
+  static bool stableState = HIGH;
+
+  bool currentReading = digitalRead(START_BUTTON_PIN);
+
+  if (currentReading != previousReading) {
+    debounceStart = millis();
+    previousReading = currentReading;
+  }
+
+  if (millis() - debounceStart >= 40) {
+    stableState = currentReading;
+  }
+
+  return stableState == LOW;
+}
+
+// ============================================================
+// PID LANE/WALL CENTERING
+// ============================================================
+
+void resetPID() {
+  pidIntegral = 0.0;
+  previousPidError = 0.0;
+}
+
+void updateWallCenteringPID() {
+  if (
+    !distanceData.leftValid ||
+    !distanceData.rightValid
+  ) {
+    centerSteering();
+    resetPID();
+    return;
+  }
+
+  /*
+    error = left - right
+
+    If left distance is smaller:
+    error is negative.
+    Robot is close to left wall.
+    It should steer right.
+  */
+
+  float error = filteredLeft - filteredRight;
+
+  if (abs(error) <= SIDE_DEADBAND) {
+    error = 0;
+  }
+
+  pidIntegral += error;
+  pidIntegral = constrain(
+    pidIntegral,
+    -PID_INTEGRAL_LIMIT,
+    PID_INTEGRAL_LIMIT
+  );
+
+  float derivative = error - previousPidError;
+  previousPidError = error;
+
+  float pidOutput =
+    KP * error +
+    KI * pidIntegral +
+    KD * derivative;
+
+  int correction = constrain(
+    (int)pidOutput,
+    -PID_MAX_CORRECTION,
+    PID_MAX_CORRECTION
+  );
+
+  /*
+    Negative error means too close to left.
+    We need a larger servo angle = right.
+  */
+
+  int target = SERVO_CENTER - correction;
+
+  setSteeringTarget(target);
+}
+
+// ============================================================
+// SAFETY
+// ============================================================
+
+bool criticalSensorFailure() {
+  if (
+    frontSensorErrors >= MAX_CONSECUTIVE_SENSOR_ERRORS
+  ) {
+    return true;
+  }
+
+  if (
+    leftSensorErrors >= MAX_CONSECUTIVE_SENSOR_ERRORS &&
+    rightSensorErrors >= MAX_CONSECUTIVE_SENSOR_ERRORS
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+bool immediateFrontDanger() {
+  if (!distanceData.frontValid) {
+    return false;
+  }
+
+  return filteredFront <= FRONT_EMERGENCY_DISTANCE;
+}
+
+void emergencyStop(const char *reason) {
+  stopMotor();
+  centerSteering();
+
+  Serial.print("EMERGENCY: ");
+  Serial.println(reason);
+
+  changeState(STATE_EMERGENCY_STOP);
+}
+
+// ============================================================
+// LAP COUNTING
+// ============================================================
+
+bool isGroundBoundaryColor() {
+  return (
+    groundDetectedColor == COLOR_BLUE ||
+    groundDetectedColor == COLOR_ORANGE
+  );
+}
+
+void updateLapCounter() {
+  bool lineNow = isGroundBoundaryColor();
+  unsigned long now = millis();
+
+  if (
+    lineNow &&
+    !groundLineActive &&
+    now - lastGroundLineTime >= GROUND_LINE_DEBOUNCE_MS
+  ) {
+    groundLineActive = true;
+    lastGroundLineTime = now;
+    sectionEventCount++;
+
+    if (!firstBoundaryRecorded) {
+      firstBoundaryOffsetMs = now - robotStartTime;
+
+      firstBoundaryOffsetMs = constrain(
+        firstBoundaryOffsetMs,
+        MIN_FINISH_OFFSET_MS,
+        MAX_FINISH_OFFSET_MS
+      );
+
+      firstBoundaryRecorded = true;
+
+      Serial.print("First boundary offset: ");
+      Serial.println(firstBoundaryOffsetMs);
+    }
+
+    completedLaps =
+      sectionEventCount / SECTION_EVENTS_PER_LAP;
+
+    Serial.print("SECTION EVENT: ");
+    Serial.print(sectionEventCount);
+
+    Serial.print(" | LAPS: ");
+    Serial.println(completedLaps);
+  }
+
+  if (!lineNow) {
+    groundLineActive = false;
+  }
+}
+
+// ============================================================
+// CORNER DETECTION AND CONTROL
+// ============================================================
+
+bool shouldStartCornerTurn() {
+  if (!distanceData.frontValid) {
+    return false;
+  }
+
+  if (filteredFront > CORNER_FRONT_DISTANCE) {
+    return false;
+  }
+
+  // Do not treat a recognized colored pillar as a corner.
+  if (
+    frontDetectedColor == COLOR_RED ||
+    frontDetectedColor == COLOR_GREEN
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+void startCornerTurn() {
+  resetPID();
+
+  if (imuReady) {
+    updateIMU();
+    cornerStartYawDeg = currentYawDeg;
+  }
+
+  /*
+    Turn toward the side with more open distance.
+    This allows operation in either clockwise or
+    counter-clockwise orientation.
+  */
+
+  if (
+    distanceData.leftValid &&
+    distanceData.rightValid
+  ) {
+    cornerTurningLeft =
+      filteredLeft > filteredRight;
+  } else if (distanceData.leftValid) {
+    cornerTurningLeft = true;
+  } else {
+    cornerTurningLeft = false;
+  }
+
+  if (cornerTurningLeft) {
+    steerFullLeft();
+  } else {
+    steerFullRight();
+  }
+
+  changeState(STATE_CORNER_TURN);
+}
+
+void handleCornerTurn() {
+  if (cornerTurningLeft) {
+    steerFullLeft();
+  } else {
+    steerFullRight();
+  }
+
+  moveForward(MOTOR_CORNER_SPEED);
+
+  if (stateElapsed() < CORNER_MIN_TIME_MS) {
+    return;
+  }
+
+  bool frontClear =
+    distanceData.frontValid &&
+    filteredFront > FRONT_SLOW_DISTANCE;
+
+  bool imuTurnComplete = false;
+
+  if (imuReady && USE_IMU_FOR_CORNER_EXIT) {
+    float turnedAngle =
+      absoluteYawChange(cornerStartYawDeg, currentYawDeg);
+
+    imuTurnComplete =
+      turnedAngle >= CORNER_EXIT_ANGLE_DEG;
+  }
+
+  bool timeout =
+    stateElapsed() >= CORNER_MAX_TIME_MS;
+
+  /*
+    The minimum time prevents a false early exit.
+    The IMU provides repeatable turn completion, while frontClear
+    and timeout remain safe fallbacks.
+  */
+  if (
+    stateElapsed() >= CORNER_MIN_TIME_MS &&
+    (imuTurnComplete || frontClear || timeout)
+  ) {
+    centerSteering();
+    resetPID();
+
+    if (imuReady) {
+      roundHeadingDeg = currentYawDeg;
+    }
+
+    changeState(STATE_NORMAL_DRIVING);
+  }
+}
+
+// ============================================================
+// OBSTACLE DETECTION AND AVOIDANCE
+// ============================================================
+
+bool obstacleDetectionAllowed() {
+  return (
+    CHALLENGE_MODE == OBSTACLE_CHALLENGE &&
+    millis() - lastObstacleTime >= OBSTACLE_COOLDOWN_MS
+  );
+}
+
+bool coloredObstacleDetected() {
+  if (!obstacleDetectionAllowed()) {
+    return false;
+  }
+
+  if (!distanceData.frontValid) {
+    return false;
+  }
+
+  if (filteredFront > OBSTACLE_TRIGGER_DISTANCE) {
+    return false;
+  }
+
+  return (
+    frontDetectedColor == COLOR_RED ||
+    frontDetectedColor == COLOR_GREEN
+  );
+}
+
+void startObstacleAvoidance() {
+  activeObstacleColor = frontDetectedColor;
+
+  if (imuReady) {
+    updateIMU();
+    obstacleStartYawDeg = currentYawDeg;
+  }
+  lastObstacleTime = millis();
+  resetPID();
+
+  if (activeObstacleColor == COLOR_RED) {
+    /*
+      Red pillar must be passed on the right.
+      Vehicle first moves toward the right side.
+    */
+    steerFullRight();
+    changeState(STATE_AVOID_RED);
+  } else if (activeObstacleColor == COLOR_GREEN) {
+    /*
+      Green pillar must be passed on the left.
+      Vehicle first moves toward the left side.
+    */
+    steerFullLeft();
+    changeState(STATE_AVOID_GREEN);
+  }
+}
+
+void handleAvoidRed() {
+  steerFullRight();
+  moveForward(MOTOR_OBSTACLE_SPEED);
+
+  if (stateElapsed() >= OBSTACLE_FIRST_STEER_MS) {
+    steerFullLeft();
+    changeState(STATE_RECOVER_FROM_OBSTACLE);
+  }
+}
+
+void handleAvoidGreen() {
+  steerFullLeft();
+  moveForward(MOTOR_OBSTACLE_SPEED);
+
+  if (stateElapsed() >= OBSTACLE_FIRST_STEER_MS) {
+    steerFullRight();
+    changeState(STATE_RECOVER_FROM_OBSTACLE);
+  }
+}
+
+void handleObstacleRecovery() {
+  if (activeObstacleColor == COLOR_RED) {
+    steerFullLeft();
+  } else if (activeObstacleColor == COLOR_GREEN) {
+    steerFullRight();
+  }
+
+  moveForward(MOTOR_OBSTACLE_SPEED);
+
+  if (stateElapsed() >= OBSTACLE_RECOVER_MS) {
+    centerSteering();
+    activeObstacleColor = COLOR_UNKNOWN;
+    resetPID();
+    changeState(STATE_NORMAL_DRIVING);
+  }
+}
+
+// ============================================================
+// NORMAL DRIVING
+// ============================================================
+
+void handleNormalDriving() {
+  if (immediateFrontDanger()) {
+    closeFrontCounter++;
+  } else {
+    closeFrontCounter = 0;
+  }
+
+  if (closeFrontCounter >= REQUIRED_CLOSE_READINGS) {
+    stopMotor();
+
+    /*
+      A close front wall may be a corner.
+      Let corner logic decide rather than ending immediately.
+    */
+
+    if (shouldStartCornerTurn()) {
+      closeFrontCounter = 0;
+      startCornerTurn();
+      return;
+    }
+
+    emergencyStop("Front obstacle too close");
+    return;
+  }
+
+  if (coloredObstacleDetected()) {
+    startObstacleAvoidance();
+    return;
+  }
+
+  if (shouldStartCornerTurn()) {
+    startCornerTurn();
+    return;
+  }
+
+  updateWallCenteringPID();
+
+  if (
+    distanceData.frontValid &&
+    filteredFront <= FRONT_SLOW_DISTANCE
+  ) {
+    moveForward(MOTOR_SLOW_SPEED);
+  } else {
+    moveForward(MOTOR_NORMAL_SPEED);
+  }
+
+  updateLapCounter();
+
+  if (
+    sectionEventCount >= REQUIRED_SECTION_EVENTS
+  ) {
+    if (CHALLENGE_MODE == OPEN_CHALLENGE) {
+      finishOffsetStartTime = millis();
+      centerSteering();
+      changeState(STATE_FINISH_OFFSET);
+    } else {
+      resetPID();
+      centerSteering();
+      changeState(STATE_SEARCH_PARKING);
+    }
+  }
+}
+
+// ============================================================
+// OPEN CHALLENGE FINISH
+// ============================================================
+
+void handleFinishOffset() {
+  updateWallCenteringPID();
+  moveForward(MOTOR_SLOW_SPEED);
+
+  unsigned long finishDriveTime =
+    firstBoundaryRecorded
+      ? firstBoundaryOffsetMs
+      : 1600;
+
+  if (
+    millis() - finishOffsetStartTime >= finishDriveTime
+  ) {
+    stopMotor();
+    centerSteering();
+    changeState(STATE_FINISHED);
+  }
+}
+
+// ============================================================
+// PARKING SEARCH
+// ============================================================
+
+bool leftParkingOpening() {
+  /*
+    If the ToF cannot get a reading because the space is
+    very open, it may also represent an opening.
+  */
+
+  return (
+    !distanceData.leftValid ||
+    filteredLeft >= PARKING_OPEN_DISTANCE
+  );
+}
+
+bool rightParkingOpening() {
+  return (
+    !distanceData.rightValid ||
+    filteredRight >= PARKING_OPEN_DISTANCE
+  );
+}
+
+void resetParkingOpeningDetection() {
+  parkingOpeningDetected = false;
+  parkingOpeningStartTime = 0;
+  parkingSide = PARKING_NONE;
+}
+
+void handleSearchParking() {
+  moveForward(MOTOR_SLOW_SPEED);
+  updateWallCenteringPID();
+
+  bool leftOpen  = leftParkingOpening();
+  bool rightOpen = rightParkingOpening();
+
+  if (!parkingOpeningDetected) {
+    if (leftOpen || rightOpen) {
+      parkingOpeningDetected = true;
+      parkingOpeningStartTime = millis();
+
+      if (leftOpen && !rightOpen) {
+        parkingSide = PARKING_LEFT;
+      } else if (rightOpen && !leftOpen) {
+        parkingSide = PARKING_RIGHT;
+      } else {
+        // If both appear open, select the larger valid side.
+        if (
+          distanceData.leftValid &&
+          distanceData.rightValid
+        ) {
+          parkingSide =
+            filteredLeft > filteredRight
+              ? PARKING_LEFT
+              : PARKING_RIGHT;
+        } else if (leftOpen) {
+          parkingSide = PARKING_LEFT;
+        } else {
+          parkingSide = PARKING_RIGHT;
+        }
+      }
+    }
+
+    return;
+  }
+
+  bool selectedSideStillOpen = false;
+
+  if (parkingSide == PARKING_LEFT) {
+    selectedSideStillOpen = leftOpen;
+  } else if (parkingSide == PARKING_RIGHT) {
+    selectedSideStillOpen = rightOpen;
+  }
+
+  if (!selectedSideStillOpen) {
+    resetParkingOpeningDetection();
+    return;
+  }
+
+  if (
+    millis() - parkingOpeningStartTime >=
+    PARKING_OPEN_CONFIRM_MS
+  ) {
+    centerSteering();
+    changeState(STATE_PARKING_STEP_1);
+  }
+}
+
+// ============================================================
+// PARALLEL PARKING
+// ============================================================
+
+void handleParkingStep1() {
+  /*
+    Move slightly forward past the beginning of the space.
+  */
+
+  centerSteering();
+  moveForward(MOTOR_PARKING_SPEED);
+
+  if (stateElapsed() >= PARK_STEP_1_TIME_MS) {
+    stopMotor();
+
+    if (parkingSide == PARKING_LEFT) {
+      steerFullLeft();
+    } else {
+      steerFullRight();
+    }
+
+    changeState(STATE_PARKING_STEP_2);
+  }
+}
+
+void handleParkingStep2() {
+  /*
+    Reverse into the parking space.
+  */
+
+  if (parkingSide == PARKING_LEFT) {
+    steerFullLeft();
+  } else {
+    steerFullRight();
+  }
+
+  moveBackward(MOTOR_PARKING_SPEED);
+
+  if (stateElapsed() >= PARK_STEP_2_TIME_MS) {
+    if (parkingSide == PARKING_LEFT) {
+      steerFullRight();
+    } else {
+      steerFullLeft();
+    }
+
+    changeState(STATE_PARKING_STEP_3);
+  }
+}
+
+void handleParkingStep3() {
+  /*
+    Counter-steer while reversing to align parallel.
+  */
+
+  if (parkingSide == PARKING_LEFT) {
+    steerFullRight();
+  } else {
+    steerFullLeft();
+  }
+
+  moveBackward(MOTOR_PARKING_SPEED);
+
+  bool sideCloseEnough = false;
+
+  if (
+    parkingSide == PARKING_LEFT &&
+    distanceData.leftValid
+  ) {
+    sideCloseEnough =
+      filteredLeft <= PARKING_CLOSE_DISTANCE;
+  }
+
+  if (
+    parkingSide == PARKING_RIGHT &&
+    distanceData.rightValid
+  ) {
+    sideCloseEnough =
+      filteredRight <= PARKING_CLOSE_DISTANCE;
+  }
+
+  if (
+    sideCloseEnough ||
+    stateElapsed() >= PARK_STEP_3_TIME_MS
+  ) {
+    centerSteering();
+    changeState(STATE_PARKING_STEP_4);
+  }
+}
+
+void handleParkingStep4() {
+  /*
+    Small forward correction to straighten the vehicle.
+  */
+
+  centerSteering();
+  moveForward(MOTOR_PARKING_SPEED);
+
+  if (stateElapsed() >= PARK_STEP_4_TIME_MS) {
+    stopMotor();
+    centerSteering();
+    changeState(STATE_FINISHED);
+  }
+}
+
+// ============================================================
+// SERIAL DEBUGGING
+// ============================================================
+
+const char *colorName(DetectedColor color) {
+  switch (color) {
+    case COLOR_RED:
+      return "RED";
+
+    case COLOR_GREEN:
+      return "GREEN";
+
+    case COLOR_BLUE:
+      return "BLUE";
+
+    case COLOR_ORANGE:
+      return "ORANGE";
+
+    case COLOR_WHITE:
+      return "WHITE";
+
+    case COLOR_BLACK:
+      return "BLACK";
+
+    default:
+      return "UNKNOWN";
+  }
+}
+
+const char *stateName(RobotState state) {
+  switch (state) {
+    case STATE_WAITING_START:
+      return "WAIT";
+
+    case STATE_NORMAL_DRIVING:
+      return "DRIVE";
+
+    case STATE_CORNER_TURN:
+      return "CORNER";
+
+    case STATE_AVOID_RED:
+      return "RED";
+
+    case STATE_AVOID_GREEN:
+      return "GREEN";
+
+    case STATE_RECOVER_FROM_OBSTACLE:
+      return "RECOVER";
+
+    case STATE_SEARCH_PARKING:
+      return "SEARCH_PARK";
+
+    case STATE_PARKING_STEP_1:
+      return "PARK_1";
+
+    case STATE_PARKING_STEP_2:
+      return "PARK_2";
+
+    case STATE_PARKING_STEP_3:
+      return "PARK_3";
+
+    case STATE_PARKING_STEP_4:
+      return "PARK_4";
+
+    case STATE_FINISH_OFFSET:
+      return "FINISH_OFFSET";
+
+    case STATE_FINISHED:
+      return "FINISHED";
+
+    case STATE_EMERGENCY_STOP:
+      return "EMERGENCY";
+
+    default:
+      return "?";
+  }
+}
+
+void printRobotStatus() {
+  unsigned long now = millis();
+
+  if (now - previousPrintTime < PRINT_INTERVAL_MS) {
+    return;
+  }
+
+  previousPrintTime = now;
+
+  Serial.print("State=");
+  Serial.print(stateName(robotState));
+
+  Serial.print(" | F=");
+  if (distanceData.frontValid) {
+    Serial.print((int)filteredFront);
+  } else {
+    Serial.print("ERR");
+  }
+
+  Serial.print(" L=");
+  if (distanceData.leftValid) {
+    Serial.print((int)filteredLeft);
+  } else {
+    Serial.print("ERR");
+  }
+
+  Serial.print(" R=");
+  if (distanceData.rightValid) {
+    Serial.print((int)filteredRight);
+  } else {
+    Serial.print("ERR");
+  }
+
+  Serial.print(" | Yaw=");
+  if (imuReady) {
+    Serial.print(currentYawDeg, 1);
+  } else {
+    Serial.print("NA");
+  }
+
+  Serial.print(" | Servo=");
+  Serial.print(currentServoAngle);
+  Serial.print("->");
+  Serial.print(targetServoAngle);
+
+  Serial.print(" | FrontColor=");
+  Serial.print(colorName(frontDetectedColor));
+
+  Serial.print("(");
+  Serial.print(frontRGB.red);
+  Serial.print(",");
+  Serial.print(frontRGB.green);
+  Serial.print(",");
+  Serial.print(frontRGB.blue);
+  Serial.print(")");
+
+  Serial.print(" | Ground=");
+  Serial.print(colorName(groundDetectedColor));
+
+  Serial.print("(");
+  Serial.print(groundRGB.red);
+  Serial.print(",");
+  Serial.print(groundRGB.green);
+  Serial.print(",");
+  Serial.print(groundRGB.blue);
+  Serial.print(")");
+
+  Serial.print(" | Sections=");
+  Serial.print(sectionEventCount);
+
+  Serial.print(" | Laps=");
+  Serial.print(completedLaps);
+
+  Serial.print(" | Time=");
+  if (robotStartTime > 0) {
+    Serial.print((millis() - robotStartTime) / 1000);
+  } else {
+    Serial.print(0);
+  }
+
+  Serial.println("s");
+}
+
+// ============================================================
+// SETUP
+// ============================================================
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  Serial.println();
+  Serial.println("========================================");
+  Serial.println("BIRTICS WRO 2026");
+  Serial.println("FULL COMPETITION BASELINE");
+  Serial.println("========================================");
+
+  if (CHALLENGE_MODE == OPEN_CHALLENGE) {
+    Serial.println("MODE: OPEN CHALLENGE");
+  } else {
+    Serial.println("MODE: OBSTACLE CHALLENGE");
+  }
+
+  // ----------------------------------------------------------
+  // START BUTTON
+  // ----------------------------------------------------------
+
+  pinMode(START_BUTTON_PIN, INPUT_PULLUP);
+
+  // ----------------------------------------------------------
+  // MOTOR
+  // ----------------------------------------------------------
+
+  pinMode(MOTOR_IN3, OUTPUT);
+  pinMode(MOTOR_IN4, OUTPUT);
+
+  digitalWrite(MOTOR_IN3, LOW);
+  digitalWrite(MOTOR_IN4, LOW);
+
+  bool pwmReady = ledcAttach(
+    MOTOR_ENB,
+    PWM_FREQUENCY,
+    PWM_RESOLUTION
+  );
+
+  if (!pwmReady) {
+    Serial.println("ERROR: Motor PWM initialization failed.");
+
+    while (true) {
+      stopMotor();
+      delay(1000);
+    }
+  }
+
+  stopMotor();
+
+  // ----------------------------------------------------------
+  // SERVO
+  // ----------------------------------------------------------
+
+  steeringServo.setPeriodHertz(50);
+  steeringServo.attach(SERVO_PIN);
+
+  currentServoAngle = SERVO_CENTER;
+  targetServoAngle  = SERVO_CENTER;
+
+  steeringServo.write(SERVO_CENTER);
+
+  Serial.println("Servo centered.");
+  delay(700);
+
+  // ----------------------------------------------------------
+  // COLOR SENSORS
+  // ----------------------------------------------------------
+
+  pinMode(COLOR_S0, OUTPUT);
+  pinMode(COLOR_S1, OUTPUT);
+  pinMode(COLOR_S2, OUTPUT);
+  pinMode(COLOR_S3, OUTPUT);
+
+  pinMode(GROUND_COLOR_OUT, INPUT);
+  pinMode(FRONT_COLOR_OUT, INPUT);
+
+  /*
+    TCS3200 frequency scaling:
+    S0 HIGH, S1 LOW = 20%
+  */
+
+  digitalWrite(COLOR_S0, HIGH);
+  digitalWrite(COLOR_S1, LOW);
+
+  Serial.println("Color sensors configured.");
+
+  // ----------------------------------------------------------
+  // I2C AND ToF
+  // ----------------------------------------------------------
+
+  Wire.begin(SDA_PIN, SCL_PIN);
+  Wire.setClock(100000);
+
+  if (!initializeToFSensors()) {
+    Serial.println("ERROR: ToF initialization failed.");
+
+    stopMotor();
+    centerSteering();
+
+    while (true) {
+      updateServoSmoothly();
+      delay(20);
+    }
+  }
+
+  Serial.println("All ToF sensors initialized.");
+
+  // ----------------------------------------------------------
+  // MPU6050 ON THE SAME I2C EXPANSION BOARD
+  // ----------------------------------------------------------
+
+  initializeMPU6050();
+
+  // Initial readings
+  for (int i = 0; i < 10; i++) {
+    updateIMU();
+    readDistanceSensors();
+    updateDistanceFilters();
+    updateColorSensors();
+    updateServoSmoothly();
+    delay(50);
+  }
+
+  stopMotor();
+  centerSteering();
+
+  changeState(STATE_WAITING_START);
+
+  Serial.println();
+  Serial.println("Robot is ON and waiting.");
+  Serial.println("Place robot fully inside the start zone.");
+  Serial.println("After judge says GO, press ESP32 BOOT once.");
+  Serial.println("Do not hold BOOT during power-on.");
+}
+
+// ============================================================
+// MAIN LOOP
+// ============================================================
+
+void loop() {
+  updateIMU();
+  readDistanceSensors();
+  updateDistanceFilters();
+  updateColorSensors();
+  updateServoSmoothly();
+  printRobotStatus();
+
+  // ----------------------------------------------------------
+  // WAITING STATE
+  // ----------------------------------------------------------
+
+  if (robotState == STATE_WAITING_START) {
+    stopMotor();
+    centerSteering();
+
+    if (startButtonPressed()) {
+      delay(60);
+
+      while (digitalRead(START_BUTTON_PIN) == LOW) {
+        stopMotor();
+        updateServoSmoothly();
+        delay(5);
+      }
+
+      sectionEventCount = 0;
+      completedLaps = 0;
+
+      groundLineActive = false;
+      firstBoundaryRecorded = false;
+      firstBoundaryOffsetMs = 0;
+
+      resetPID();
+      resetParkingOpeningDetection();
+
+      closeFrontCounter = 0;
+      robotStartTime = millis();
+
+      if (imuReady) {
+        updateIMU();
+        roundHeadingDeg = currentYawDeg;
+      }
+
+      Serial.println("START BUTTON PRESSED.");
+      Serial.println("ROUND STARTED.");
+
+      changeState(STATE_NORMAL_DRIVING);
+    }
+
+    delay(5);
+    return;
+  }
+
+  // ----------------------------------------------------------
+  // ROUND TIMEOUT
+  // ----------------------------------------------------------
+
+  if (
+    robotStartTime > 0 &&
+    millis() - robotStartTime >= ROUND_TIMEOUT_MS &&
+    robotState != STATE_FINISHED &&
+    robotState != STATE_EMERGENCY_STOP
+  ) {
+    emergencyStop("Three-minute round timeout");
+  }
+
+  // ----------------------------------------------------------
+  // SENSOR FAILURE
+  // ----------------------------------------------------------
+
+  if (
+    criticalSensorFailure() &&
+    robotState != STATE_FINISHED &&
+    robotState != STATE_EMERGENCY_STOP
+  ) {
+    emergencyStop("Critical ToF sensor failure");
+  }
+
+  // ----------------------------------------------------------
+  // STATE MACHINE
+  // ----------------------------------------------------------
+
+  switch (robotState) {
+    case STATE_NORMAL_DRIVING:
+      handleNormalDriving();
+      break;
+
+    case STATE_CORNER_TURN:
+      handleCornerTurn();
+      break;
+
+    case STATE_AVOID_RED:
+      handleAvoidRed();
+      break;
+
+    case STATE_AVOID_GREEN:
+      handleAvoidGreen();
+      break;
+
+    case STATE_RECOVER_FROM_OBSTACLE:
+      handleObstacleRecovery();
+      break;
+
+    case STATE_SEARCH_PARKING:
+      handleSearchParking();
+      break;
+
+    case STATE_PARKING_STEP_1:
+      handleParkingStep1();
+      break;
+
+    case STATE_PARKING_STEP_2:
+      handleParkingStep2();
+      break;
+
+    case STATE_PARKING_STEP_3:
+      handleParkingStep3();
+      break;
+
+    case STATE_PARKING_STEP_4:
+      handleParkingStep4();
+      break;
+
+    case STATE_FINISH_OFFSET:
+      handleFinishOffset();
+      break;
+
+    case STATE_FINISHED:
+      stopMotor();
+      centerSteering();
+      break;
+
+    case STATE_EMERGENCY_STOP:
+      stopMotor();
+      centerSteering();
+      break;
+
+    case STATE_WAITING_START:
+    default:
+      stopMotor();
+      centerSteering();
+      break;
+  }
+
+  delay(5);
+}
