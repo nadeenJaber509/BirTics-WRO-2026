@@ -132,7 +132,7 @@ For a complete explanation of the software architecture, refer to the **[Softwar
 # 👥 Team BirTics
 
 <p align="center">
-  <img src="assets/diagrams/hardware-architecture.png">
+  <img src="assets/diagrams/team.png">
   alt="BirTics Team"
        width="900">
 </p>
