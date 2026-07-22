@@ -41,7 +41,7 @@ Birzeit University • Palestine 🇵🇸
 
 <br><br>
 
-📄 **[View Team Roles →](docs/team-roles.md)**
+
 
 </div>
 
@@ -152,12 +152,6 @@ The robot software is organized into independent functional layers. Each layer p
 | **Actuation** | Drive the steering servo and rear-wheel motor to execute movement. |
 
 For a complete explanation of the software architecture, refer to the **[Software Architecture](docs/software-architecture/README.md)** documentation.
-
-# 👥 Team BirTics
-
-<p align="center">
-  <a href="docs/team-roles.md">📄 View Team Roles →</a>
-</p>
 
 ---
 
