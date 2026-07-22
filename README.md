@@ -25,8 +25,7 @@ Birzeit University • Palestine 🇵🇸
 [![Controller](https://img.shields.io/badge/ESP32-DevKit%20V1-10B981?style=for-the-badge)](docs/software-architecture/esp32_software_strategy.md)
 [![Repository](https://img.shields.io/badge/Documentation-Engineering%20Notebook-F59E0B?style=for-the-badge)](docs/engineering-journal.md)
 
-</div>
-# 👥 Meet the Team
+# 👥 Team BirTics
 
 <div align="center">
 
@@ -38,13 +37,17 @@ Birzeit University • Palestine 🇵🇸
 
 <br>
 
-**Meet the BirTics team — click the image to learn more about our roles and responsibilities.**
+**Meet the BirTics team — click the image to explore each member's role and responsibilities.**
+
+<br><br>
+
+📄 **[View Team Roles →](docs/team-roles.md)**
 
 </div>
 
 ---
 
-# 📖 Executive Summary
+
 
 # 📖 Executive Summary
 
