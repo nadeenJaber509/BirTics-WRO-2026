@@ -78,9 +78,9 @@ The three VL6180X sensors share a common I²C bus while using independent shutdo
 |---------|-----------|
 | SDA | GPIO21 |
 | SCL | GPIO22 |
-| Left SHUT | GPIO25 |
-| Center SHUT | GPIO26 |
-| Right SHUT | GPIO27 |
+| Left SHUT | GPIO32 |
+| Center SHUT | GPIO25 |
+| Right SHUT | GPIO33 |
 
 Each sensor receives a unique I²C address during initialization.
 
