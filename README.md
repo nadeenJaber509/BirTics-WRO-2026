@@ -24,6 +24,17 @@
 [![Status](https://img.shields.io/badge/Project-System%20Integration-orange?style=for-the-badge)
 
 </div>
+## 👥 Meet the Team
+
+<p align="center">
+  <img src="assets/diagrams/team.png"
+       alt="BirTics Team"
+       width="900">
+</p>
+
+<p align="center">
+  <a href="docs/team-roles.md">📄 View Team Roles →</a>
+</p>
 
 # 📖 Executive Summary
 
@@ -113,3 +124,4 @@ The architecture consists of four primary layers:
 | **Actuation** | Drive the steering servo and rear-wheel motor to execute movement. |
 
 For a complete explanation of the architecture, refer to the **[Software Architecture](docs/software-architecture/README.md)** documentation.
+
