@@ -99,7 +99,7 @@ The robot has been designed around a modular philosophy. Each subsystem—includ
 The BirTics robot is built around an ESP32-based modular hardware architecture. Each subsystem is connected to the ESP32 through dedicated communication interfaces, allowing the robot to process sensor data and control the actuators in real time.
 
 <p align="center">
-<img src="assets/daigrams/hardware-architecture.png" width="950">
+  <img src="assets/diagrams/hardware-architecture.png" width="950">
 </p>
 
 The hardware consists of:
@@ -132,8 +132,8 @@ For a complete explanation of the software architecture, refer to the **[Softwar
 # 👥 Team BirTics
 
 <p align="center">
-  <img src="assets/diagrams/team.png">
-  alt="BirTics Team"
+        <img src="assets/diagrams/team.png">
+        < alt="BirTics Team"
        width="900">
 </p>
 
