@@ -24,7 +24,9 @@
 [![Status](https://img.shields.io/badge/Project-System%20Integration-orange?style=for-the-badge)
 
 </div>
+
 ## 👥 Meet the Team
+
 
 <p align="center">
   <img src="assets/diagrams/team.png"
