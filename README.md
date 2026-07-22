@@ -26,6 +26,25 @@ Birzeit University • Palestine 🇵🇸
 [![Repository](https://img.shields.io/badge/Documentation-Engineering%20Notebook-F59E0B?style=for-the-badge)](docs/engineering-journal.md)
 
 </div>
+## 👥 Meet the Team
+
+<div align="center">
+
+<a href="docs/team-roles.md">
+<img src="assets/team-members.jpg"
+     alt="BirTics Team"
+     width="900"/>
+</a>
+
+<br>
+
+**Meet the BirTics team — click the image to learn more about our roles and responsibilities.**
+
+</div>
+
+---
+
+# 📖 Executive Summary
 
 # 📖 Executive Summary
 
