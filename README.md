@@ -1,27 +1,27 @@
 <div align="center">
 
-# 🚗 BirTics
-
-## WRO Future Engineers 2026
-
-### Autonomous Self-Driving Car
-
-**Birzeit University • Palestine 🇵🇸**
+<img src="assets/robot/hero-view.png" alt="BirTics Robot" width="900"/>
 
 <br>
 
-<p align="center">
-<img src="assets/robot/hero-view.png" width="900">
-</p>
+# 🚗 BirTics
 
-*A modular autonomous vehicle engineered through iterative design, testing, and continuous improvement.*
+### Autonomous Self-Driving Vehicle
+
+**WRO Future Engineers 2026**
+
+Birzeit University • Palestine 🇵🇸
+
+<br>
+
+*A modular autonomous robot engineered through iterative design, testing, and continuous improvement.*
 
 <br>
 
 [![WRO](https://img.shields.io/badge/WRO-Future%20Engineers%202026-red?style=for-the-badge)](https://wro-association.org/)
-[![Team](https://img.shields.io/badge/Team-BirTics-blue?style=for-the-badge)](docs/team-roles.md)
-[![Controller](https://img.shields.io/badge/ESP32-Main%20Controller-green?style=for-the-badge)](docs/software-architecture/esp32_software_strategy.md)
-[![Status](https://img.shields.io/badge/Project-System%20Integration-orange?style=for-the-badge)
+[![Team](https://img.shields.io/badge/Team-BirTics-2563EB?style=for-the-badge)](docs/team-roles.md)
+[![Controller](https://img.shields.io/badge/ESP32-DevKit%20V1-10B981?style=for-the-badge)](docs/software-architecture/esp32_software_strategy.md)
+[![Repository](https://img.shields.io/badge/Documentation-Engineering%20Notebook-F59E0B?style=for-the-badge)](docs/engineering-journal.md)
 
 </div>
 
@@ -130,10 +130,6 @@ The robot software is organized into independent functional layers. Each layer p
 For a complete explanation of the software architecture, refer to the **[Software Architecture](docs/software-architecture/README.md)** documentation.
 
 # 👥 Team BirTics
-
-<p align="center">
-        <img src="assets/diagrams/team.png">
-</p>
 
 <p align="center">
   <a href="docs/team-roles.md">📄 View Team Roles →</a>
