@@ -26,7 +26,7 @@ Birzeit University • Palestine 🇵🇸
 [![Repository](https://img.shields.io/badge/Documentation-Engineering%20Notebook-F59E0B?style=for-the-badge)](docs/engineering-journal.md)
 
 </div>
-## 👥 Meet the Team
+# 👥 Meet the Team
 
 <div align="center">
 
