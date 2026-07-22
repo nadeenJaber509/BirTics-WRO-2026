@@ -1,8 +1,4 @@
-<div align="center">
 
-<img src="assets/robot/hero-view.png" alt="BirTics Robot" width="900"/>
-
-<br>
 
 # 🚗 BirTics
 
@@ -11,6 +7,12 @@
 **WRO Future Engineers 2026**
 
 Birzeit University • Palestine 🇵🇸
+
+<div align="center">
+
+<img src="assets/robot/hero-view.png" alt="BirTics Robot" width="900"/>
+
+<br>
 
 <br>
 
