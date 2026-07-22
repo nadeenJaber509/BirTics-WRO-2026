@@ -11,7 +11,7 @@
 <br>
 
 <p align="center">
-<img src="assets/images/robot/hero-view.png" width="900">
+<img src="assets/robot/hero-view.png" width="900">
 </p>
 
 *A modular autonomous vehicle engineered through iterative design, testing, and continuous improvement.*
