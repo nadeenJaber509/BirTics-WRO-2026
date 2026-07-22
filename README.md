@@ -1,128 +1,115 @@
 <div align="center">
 
-# BirTics - WRO 2026 Future Engineers
+# 🚗 BirTics
 
-**Autonomous self-driving car project for WRO Future Engineers 2026**
+## WRO Future Engineers 2026
 
-BirTics is a student engineering team from **Birzeit University, Palestine** building and documenting a self-driving robot for the WRO Future Engineers category.
+### Autonomous Self-Driving Car
 
-[![WRO](https://img.shields.io/badge/WRO-Future%20Engineers%202026-red)](https://wro-association.org/)
-[![Team](https://img.shields.io/badge/team-BirTics-blue)](docs/team-roles.md)
-[![Controller](https://img.shields.io/badge/controller-ESP32-green)](docs/software-architecture/esp32_software_strategy.md)
-[![Docs](https://img.shields.io/badge/docs-engineering%20record-orange)](docs/)
+**Birzeit University • Palestine 🇵🇸**
 
-<!--
-Hero image:
-Add a robot photo or CAD render to assets/, then replace the placeholder below
-with a GitHub image block that points to the real image file.
--->
+<br>
 
-> **Robot image will be added after the first mechanical build.**
+<p align="center">
+<img src="assets/images/robot/hero-view.png" width="900">
+</p>
+
+*A modular autonomous vehicle engineered through iterative design, testing, and continuous improvement.*
+
+<br>
+
+[![WRO](https://img.shields.io/badge/WRO-Future%20Engineers%202026-red?style=for-the-badge)](https://wro-association.org/)
+[![Team](https://img.shields.io/badge/Team-BirTics-blue?style=for-the-badge)](docs/team-roles.md)
+[![Controller](https://img.shields.io/badge/ESP32-Main%20Controller-green?style=for-the-badge)](docs/software-architecture/esp32_software_strategy.md)
+[![Status](https://img.shields.io/badge/Project-System%20Integration-orange?style=for-the-badge)
 
 </div>
 
----
+# 📖 Executive Summary
 
-## Project Overview
+BirTics is a three-member engineering team participating in the **WRO Future Engineers 2026** competition.
 
-BirTics is participating in the **WRO 2026 Future Engineers Self-Driving Cars** challenge. The project focuses on designing an autonomous vehicle that can navigate the WRO track, respond to red and green traffic signs, and later complete the parking task required in the obstacle challenge.
+Our objective is to design, build, and validate an autonomous vehicle capable of completing the Future Engineers challenge while documenting every major engineering decision throughout the development process.
 
-This repository is the team's engineering record. It brings together the project documentation, hardware planning, software architecture, early source code, team responsibilities, and development notes in one place.
+This repository serves as the project's engineering notebook. It contains the complete documentation of our mechanical design, electronics architecture, software implementation, testing activities, and development history, allowing judges to easily understand both the final solution and the reasoning behind it.
 
-The README is designed as a navigation hub for judges, mentors, and reviewers. Detailed explanations are kept inside the documentation folders so the main page stays clear and easy to scan.
+# 🗺️ Repository Navigation Guide
 
----
+If this is your first visit to our repository, we recommend exploring the project in the following order. This path follows the same engineering workflow our team used throughout development.
 
-## 🧭 Repository Guide
+| Step | Document | What You'll Find |
+|:---:|----------|------------------|
+| **①** | 👥 **[Team Roles](docs/team-roles.md)** | Meet the team and understand each member's responsibilities. |
+| **②** | 📖 **[Engineering Journal](docs/engineering-journal.md)** | Follow the complete engineering journey, major design decisions, and project evolution. |
+| **③** | ⚙️ **[Mechanical Design](docs/mechanical-design/README.md)** | Explore the chassis design, hardware evolution, and mechanical implementation. |
+| **④** | 🔌 **[Power & Sensors](docs/power-and-sensors/README.md)** | Learn about the electronics architecture, wiring, sensors, and power distribution. |
+| **⑤** | 💻 **[Software Architecture](docs/software-architecture/README.md)** | Understand the software structure, navigation strategy, and control algorithms. |
+| **⑥** | 🧪 **[Testing](docs/testing/README.md)** | Review subsystem validation, integration tests, and experimental results. |
+| **⑦** | 📂 **[Source Code](code/)** | Explore the robot firmware, supporting software, and implementation files. |
 
-**New to the project? Start here.**
+> **Recommended reading order:** Team → Engineering Journal → Mechanical Design → Power & Sensors → Software → Testing → Code
 
-The following guide is designed to help judges and reviewers quickly navigate the repository and locate the information they are interested in.
+# 🚀 Project at a Glance
 
-### ⭐ Essential Documents
-
-| If you want to... | Open... |
-|-------------------|----------|
-| 👥 Meet the team and understand each member's role | [Team Roles](docs/team-roles.md) |
-| 📖 Follow the project's evolution and engineering decisions | [Engineering Journal](docs/engineering-journal.md) |
-| ⚙️ Explore the robot's mechanical design | [Mechanical Design](docs/mechanical-design/) |
-| 💻 Understand the software architecture | [Software Architecture](docs/software-architecture/) |
-| 🧪 Review testing plans and validation | [Testing](docs/testing/) |
-| 📂 Browse the robot source code | [code/](code/) |
-
----
-
-### 📚 Supporting Documentation
-
-| Document | Description |
-|----------|-------------|
-| [Team Story](docs/story-portfolio/team-story.md) | The team's background and project motivation |
-| [ESP32 Software Strategy](docs/software-architecture/esp32_software_strategy.md) | Overall software implementation approach |
-| [Algorithms Plan](docs/software-architecture/algorithms_plan.md) | Navigation, control, and decision-making algorithms |
-| [ESP32 Firmware](code/esp32/) | Current Arduino/ESP32 firmware implementation |
-| [Python Design Prototypes](code/design/) | Early algorithm prototypes and software concepts |
-| [Project Assets](assets/) | Photos, diagrams, sketches, and project media |
+| Category | Current Solution |
+|-----------|------------------|
+| Competition | WRO Future Engineers 2026 |
+| Team | BirTics |
+| University | Birzeit University |
+| Robot Type | Autonomous Four-Wheel Vehicle |
+| Controller | ESP32 DevKit V1 |
+| Steering | Ackermann Steering |
+| Drive System | Rear-Wheel Drive |
+| Navigation | Sensor-Based Autonomous Navigation |
+| Primary Sensors | VL6180X ToF + TCS3200 Color Sensors + MPU6050 |
+| Development Stage | System Integration & Validation |
 
 ---
 
-## 🚗 Robot Overview
+# 🚗 Robot Overview
 
-BirTics is developing a **four-wheel, car-like autonomous vehicle** designed to comply with the **WRO Future Engineers 2026** regulations while maintaining a modular architecture that can evolve throughout the project.
+BirTics is a four-wheel autonomous vehicle designed for the **WRO Future Engineers 2026** category. The robot follows a modular architecture, allowing each subsystem to be developed, tested, and improved independently before full system integration.
 
-The current engineering direction is summarized below.
+---
 
-| System | Current Selection |
-|---------|-------------------|
-| **Platform** | Four-wheel car-like chassis |
-| **Drive System** | Rear-wheel drive with a physical rear axle |
-| **Steering** | Front-wheel steering using a servo linkage |
+## Robot Configuration
+
+| Component | Selected Solution |
+|-----------|-------------------|
+| **Chassis** | Four-wheel RC car platform |
+| **Steering** | Ackermann steering with servo linkage |
+| **Drive** | Rear-wheel DC motor |
 | **Main Controller** | ESP32 DevKit V1 |
-| **Distance Sensing** | Time-of-Flight (ToF) sensors |
-| **Traffic Sign Detection** | Color sensors |
-| **Orientation** | IMU-assisted heading stabilization |
-| **Computer Vision** | Planned as a possible future extension; not part of the initial implementation |
-
-The project currently follows a **sensor-based control approach**, with the ESP32 responsible for sensing, navigation, and motion control. The selected architecture provides a practical foundation for developing and testing the robot while leaving room for future improvements as the project evolves.
-
-➡️ More detailed hardware decisions are documented in the **Mechanical Design** and **Hardware Distribution** documents.
+| **Motor Driver** | L298N |
+| **Power Source** | 9V battery with regulated power distribution |
+| **Distance Sensing** | 3 × VL6180X Time-of-Flight sensors |
+| **Traffic Sign Detection** | 2 × TCS3200 Color Sensors |
+| **Orientation** | MPU6050 IMU |
+| **Programming Environment** | Arduino Framework (ESP32) |
 
 ---
 
-## Repository Structure
+### Engineering Approach
 
-| Folder | Purpose |
-| --- | --- |
-| [assets/](assets/) | Visual project materials such as future photos, sketches, CAD renders, and testing media. |
-| [code/](code/) | Source code and prototypes for the robot software. |
-| [docs/](docs/) | Engineering documentation, team records, architecture notes, and testing pages. |
+The robot has been designed around a modular philosophy. Each subsystem—including sensing, motion control, steering, and perception—is validated individually before being integrated into the complete autonomous platform. This workflow simplifies debugging, improves maintainability, and enables continuous refinement throughout development.
 
 ---
 
-## Engineering Philosophy
+# 🏗️ System Architecture
 
-BirTics documents the engineering process, not only the final robot. The repository is meant to show how decisions are made, how ideas change, and how the team moves from planning to testing through clear evidence.
+The robot is organized into independent hardware and software modules that communicate through the ESP32 controller.
 
----
+<p align="center">
+<img src="assets/diagrams/system-architecture.png" width="900">
+</p>
 
-## Team
+The architecture consists of four primary layers:
 
-| Member | Responsibility |
-| --- | --- |
-| Julnar Assi | Software Lead |
-| Lana Sayes | Mechanical Lead |
-| Nadeen Jaber | Documentation & Testing Lead |
+| Layer | Responsibility |
+|--------|----------------|
+| **Perception** | Collect environmental information using ToF sensors, color sensors, and the IMU. |
+| **Decision Making** | Process sensor readings, determine robot behavior, and generate navigation commands. |
+| **Control** | Compute steering angles and motor speed using embedded control algorithms. |
+| **Actuation** | Drive the steering servo and rear-wheel motor to execute movement. |
 
-Full responsibilities are listed in [Team Roles](docs/team-roles.md).
-
----
-
-<div align="center">
-
-**BirTics**  
-Birzeit University  
-Palestine  
-WRO Future Engineers 2026
-
-*Document the decision. Build the robot. Test the result.*
-
-</div>
+For a complete explanation of the architecture, refer to the **[Software Architecture](docs/software-architecture/README.md)** documentation.
